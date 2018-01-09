@@ -1,0 +1,26 @@
+{
+  "name": "arbitross",
+  "version": "0.0.1",
+  "description": "Crypto arbitrage robot",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha ./**/*.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kennsippell/Arbitross.git"
+  },
+  "keywords": [
+    "crypto",
+    "arbitrage"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kennsippell/Arbitross/issues"
+  },
+  "homepage": "https://github.com/kennsippell/Arbitross#readme",
+  "dependencies": {
+    "ccxt": "^1.10.621"
+  }
+}
