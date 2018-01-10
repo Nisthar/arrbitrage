@@ -1,58 +1,53 @@
-const loadMarketsForExchange = require('./loadMarketsForExchange.js');
+const fetchOrderBooks = require('./fetchOrderBooks.js');
+const getFulfillableOrders = require('./getFulfillableOrders.js');
+const getProfitableOrders = require('./getProfitableOrders.js');
 const calculateNetResultFromTrades = require('./calculateNetResultFromTrades.js');
 
 const ExchangeIds = [ 'liqui', 'huobipro' ];
 const TradeSymbol = 'BAT/ETH';
 
 const MarketHoldings = {
-  liqui: {
-    ETH: 25,
-    BAT: 2500,
-  },
-  huobipro: {
-    ETH: 25,
-    BAT: 2500,
-  },
+  // [ amount of BAT, amount of ETH ]
+  liqui: [ 25, 2500 ],
+  huobipro: [ 25, 2500 ],
 };
 
-const markets = loadMarketsForExchange(ExchangeIds);
+(async function main() {
+  /* Fetch the order books for the symbol from each exchange */
+  /* Adjust each order book to accomodate for market fees */
+  const orderBooks = await fetchOrderBooks(ExchangeIds, TradeSymbol);
 
-/* Get the order book for the markets */
-const orderBooks = getOrderBooks(markets, TradeSymbol);
+  /* Based on our holdings in the marketplace, take the fulfillable orders from each market's book */
+  /* Merge the order books into one sorted order book */
+  const fulfillableOrderBook = getFulfillableOrders(orderBooks, MarketHoldings);
 
-/* Adjust each order book to accomodate for market fees */
-addPricesAfterFeesToOrderBooks(orderBooks, ExchangeIds);
+  /* Pull out the profitable order pairs */
+  const profitableOrders = getProfitableOrders(fulfillableOrderBook);
 
-/* Based on our holdings in the marketplace, take the fulfillable orders from each market's book */
-/* Merge the order books into one sorted order book */
-const mergedFulfillableOrderBook = getFulfillableOrdersBasedOnHoldings(orderBooks, MarketHoldings);
+  /* Convert the overlapping orders into trades for each marketplace */
+  const trades = convertOrdersToTrades(profitableOrders);
 
-/* Pull out the profitable order pairs */
-const profitableOrders = getProfitableOrders(mergedFulfillableOrderBook);
+  /*
+  const trades = [
+    {
+      exchange: 'quadriga',
+      pair: 'BAT/ETH',
+      limitPrice: '0.00064',
+      amount: 10,
 
-/* Convert the overlapping orders into trades for each marketplace */
-const trades = convertOrdersToTrades(profitableOrders);
+      expectedOrders: [
+        [
+          14365, (price)
+          128.1388 (amount)
+        ],
+        ...
+      ],
+    },
+    ...
+  ]
+  */
 
-/*
-const trades = [
-  {
-    exchange: 'quadriga',
-    pair: 'BAT/ETH',
-    limitPrice: '0.00064',
-    amount: 10,
-
-    expectedOrders: [
-      {
-        14365,
-        128.1388
-      },
-      ...
-    ],
-  },
-  ...
-]
-*/
-
-/* Calculate the profit that will be made and the percent margin on stake */
-const earnings = calculateNetResultFromTrades(trades, MarketHoldings);
-console.log('Earnings', earnings);
+  /* Calculate the profit that will be made and the percent margin on stake */
+  const earnings = calculateNetResultFromTrades(trades, MarketHoldings);
+  console.log('Earnings', earnings);
+})();

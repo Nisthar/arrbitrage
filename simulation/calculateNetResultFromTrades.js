@@ -8,4 +8,4 @@ function calculateNetResultFromTrades(trades, MarketHoldings) {
   */
 }
 
-exports.default = calculateNetResultFromTrades;
+module.exports = calculateNetResultFromTrades;
