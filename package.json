@@ -22,5 +22,8 @@
   "homepage": "https://github.com/kennsippell/Arbitross#readme",
   "dependencies": {
     "ccxt": "^1.10.621"
+  },
+  "devDependencies": {
+    "mocha": "^4.1.0"
   }
 }
