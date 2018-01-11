@@ -12,8 +12,8 @@ function getFulfillableOrders(exchanges, holdings) {
 
   for (let id of ids) {
     const exchange = exchanges[id];
-    result.bids = result.bids.concat(determineFulfillableOrders(exchange.bids, holdings[id][0]));
-    result.asks = result.asks.concat(determineFulfillableOrders(exchange.asks, holdings[id][1]));
+    result.bids = result.bids.concat(determineFulfillableOrders(exchange.bids, holdings[id][0], 'bid'));
+    result.asks = result.asks.concat(determineFulfillableOrders(exchange.asks, holdings[id][1], 'ask'));
   }
 
   result.bids.sort((a,b) => a.priceWithFee - b.priceWithFee);
@@ -23,14 +23,14 @@ function getFulfillableOrders(exchanges, holdings) {
 }
 
 /* Given an array of bids/asks: [price, amount, priceAfterFees] pairs */
-function determineFulfillableOrders(orders, holdings) {
+function determineFulfillableOrders(orders, holdings, orderType) {
   const result = [];
 
   let unfulfilledHoldings = holdings;
   for (let i = 0; i < orders.length && unfulfilledHoldings > 0; ++i) {
     const order = orders[i];
     const { price, amount, priceWithFee } = order;
-    const orderValue = priceWithFee * amount;
+    const orderValue = orderType === 'bid' ? amount : amount * priceWithFee;
 
     if (orderValue < unfulfilledHoldings) {
       result.push(order);

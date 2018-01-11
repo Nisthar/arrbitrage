@@ -8,8 +8,8 @@ const TradeSymbol = 'BAT/ETH';
 
 const MarketHoldings = {
   // [ amount of BAT, amount of ETH ]
-  liqui: [ 25, 2500 ],
-  huobipro: [ 25, 2500 ],
+  liqui: [ 2500, 25 ],
+  huobipro: [ 2500, 25 ],
 };
 
 (async function main() {
