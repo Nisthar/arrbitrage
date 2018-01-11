@@ -1,3 +1,4 @@
+const genericExchangePairExperiment = require('./genericExchangePairExperiment.js');
 
 const considerableHoldingsHandler = {
   get: (target, name) => target.hasOwnProperty(name) ? target[name] : [ 10000000, 10000000 ]
@@ -13,13 +14,23 @@ const configurations = {
       'LTC/BTC', 'LTC/USDT', 'MANA/BTC', 'MANA/ETH', 'MCO/BTC', 'MCO/ETH', 'OMG/BTC', 'OMG/ETH', 'OMG/USDT', 'PAY/BTC', 'PAY/ETH', 'QTUM/BTC', 'QTUM/ETH', 'QTUM/USDT', 'REQ/BTC', 'REQ/ETH', 'SALT/BTC', 'SALT/ETH', 'SNT/BTC', 'SNT/USDT', 'STORJ/BTC', 'STORJ/USDT', 'TNT/BTC', 'TNT/ETH', 'VEN/BTC', 'VEN/ETH', 'ZRX/BTC'
     ],
   },
+  all: genericExchangePairExperiment,
 };
 
-module.exports = (name) => {
-  const config = configurations[name];
+async function getConfig(name) {
+  let config = configurations[name];
+  console.log(typeof config, config.constructor.name);
   if (typeof config === 'function') {
-    return config();
+    const result = config.constructor.name === 'AsyncFunction' ? await config() : config();
+    if (!result.holdings) {
+      result.holdings = considerableHoldings;
+    }
+
+    config = result;
   }
   
+  console.log(`Executing experiment with configuration: ${JSON.stringify(config, null, 2)}`);
   return config;
-};
+}
+
+module.exports = getConfig;

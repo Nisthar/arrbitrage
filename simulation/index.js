@@ -1,5 +1,5 @@
 const getConfiguration = require('./experimentConfigurations.js');
-const fetchOrderBooks = require('./fetchOrderBooks.js');
+const { fetchOrderBooks } = require('./fetchExchangeData.js');
 const getFulfillableOrders = require('./getFulfillableOrders.js');
 const getProfitableOrders = require('./getProfitableOrders.js');
 const calcEarningsFromOrders = require('./calcEarningsFromOrders.js');
@@ -8,7 +8,7 @@ const calcEarningsFromOrders = require('./calcEarningsFromOrders.js');
   const experimentName = process.argv[2];
   console.log(`Running experiment ${experimentName}`);
 
-  const experimentConfiguration = getConfiguration(experimentName);
+  const experimentConfiguration = await getConfiguration(experimentName);
   for (const symbol of experimentConfiguration.symbols) {
     /* Fetch the order books for the symbol from each exchange */
     /* Adjust each order book to accomodate for market fees */

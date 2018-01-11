@@ -8,6 +8,16 @@ const ccxt = require ('ccxt');
 
 const exchangeCache = {};
 
+async function getExchange(exchangeId) {
+  if (!exchangeCache[exchangeId]) {
+    console.log(`Loading market data for exchange ${exchangeId}`);
+    exchangeCache[exchangeId] = new ccxt[exchangeId]();
+    await execute(() => exchangeCache[exchangeId].loadMarkets());
+  }
+
+  return exchangeCache[exchangeId];
+}
+
 async function fetchOrderBooks(exchangeIds, symbol) {
   const exchanges = {};
   for (let id of exchangeIds) {
@@ -18,13 +28,7 @@ async function fetchOrderBooks(exchangeIds, symbol) {
 }
 
 async function fetchOrderBook(exchangeId, symbol) {
-  if (!exchangeCache[exchangeId]) {
-    console.log(`Loading market data for exchange ${exchangeId}`);
-    exchangeCache[exchangeId] = new ccxt[exchangeId]();
-    await execute(() => exchangeCache[exchangeId].loadMarkets());
-  }
-
-  const exchange = exchangeCache[exchangeId];
+  const exchange = await getExchange(exchangeId);
   if (!exchange.markets[symbol]) {
     return {};
   }
@@ -73,4 +77,7 @@ async function execute(func, maxRetries = 10, sleepBeforeRequests = 1000) {
   }
 }
 
-module.exports = fetchOrderBooks;
+module.exports = {
+  getExchange,
+  fetchOrderBooks,
+};
