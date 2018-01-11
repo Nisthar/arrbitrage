@@ -10,6 +10,16 @@
       "name": "Launch Program",
       "program": "${workspaceRoot}/simulation/index.js",
       "cwd": "${workspaceRoot}"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Run Mocha",
+      "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
+      "cwd": "${workspaceRoot}",
+      "args": ["${workspaceRoot}/**/*.test.js"],
+      "runtimeExecutable": null,
+      "env": { "NODE_ENV": "testing"}
     }
   ]
 }

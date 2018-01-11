@@ -16,8 +16,8 @@ function getFulfillableOrders(exchanges, holdings) {
     result.asks = result.asks.concat(determineFulfillableOrders(exchange.asks, holdings[id][1], 'ask'));
   }
 
-  result.bids.sort((a,b) => a.priceWithFee - b.priceWithFee);
-  result.asks.sort((a,b) => b.priceWithFee - a.priceWithFee);
+  result.bids.sort((a,b) => b.priceWithFee - a.priceWithFee);
+  result.asks.sort((a,b) => a.priceWithFee - b.priceWithFee);
 
   return result;
 }
@@ -36,7 +36,7 @@ function determineFulfillableOrders(orders, holdings, orderType) {
       result.push(order);
       unfulfilledHoldings -= orderValue;
     } else {
-      const partialAmount = unfulfilledHoldings / priceWithFee;
+      const partialAmount = orderType === 'bid' ? unfulfilledHoldings : unfulfilledHoldings / priceWithFee;
       const partialOrder = Object.assign({}, order, { amount: partialAmount });
       result.push(partialOrder);
       unfulfilledHoldings = 0;

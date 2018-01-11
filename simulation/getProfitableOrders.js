@@ -1,25 +1,41 @@
+'use strict';
+
 function getProfitableOrders(orderBook) {
   const { asks, bids } = orderBook;
-  const result = [];
+  const result = {
+    asks: [],
+    bids: [],
+  };
 
   let askIterator = 0, bidIterator = 0;
-  while (askIterator < asks.length && asks[askIterator].priceWithFee < bids[bidIterator].priceWithFee) {
-    const ask = asks[askIterator];
-    const bid = bids[bidIterator];
+  let currentAsk = Object.assign({}, asks[askIterator]), currentBid = Object.assign({}, bids[bidIterator]);
+  while (currentAsk && currentBid && currentAsk.priceWithFee < currentBid.priceWithFee) {
+    /* Don't do >= */
+    if (currentBid.priceWithFee >= currentAsk.priceWithFee) {
+      const amount = Math.min(currentAsk.amount, currentBid.amount);
+      if (amount === currentAsk.amount) {
+        result.asks.push(currentAsk);
+        currentAsk = Object.assign({}, asks[++askIterator]);
+      } else {
+        const partialAsk = Object.assign({}, currentAsk, { amount });
+        result.asks.push(partialAsk);
 
-    askIterator++;
-    bidIterator++;
+        /* currentAsk is a copy, so we adjust it to be the remaining amount */
+        currentAsk.amount -= amount;
+      }
+
+      if (amount === currentBid.amount) {
+        result.bids.push(currentBid);
+        currentBid = Object.assign({}, bids[++bidIterator]);
+      } else {
+        const partialBid = Object.assign({}, currentBid, { amount });
+        result.bids.push(partialBid);
+        currentBid.amount -= amount;
+      }
+    }
   }
 
   return result;
-}
-
-function convertToFullOrPartialOrder(order, amount) {
-  if (order.amount === amount) {
-    return order;
-  }
-
-  return Object.assign({}, order, { amount });
 }
 
 module.exports = getProfitableOrders;
