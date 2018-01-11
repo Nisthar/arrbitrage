@@ -6,6 +6,8 @@ Uses ccxt to load market information for a given exchange.
 
 const ccxt = require ('ccxt');
 
+const exchangeCache = {};
+
 async function fetchOrderBooks(exchangeIds, symbol) {
   const exchanges = {};
   for (let id of exchangeIds) {
@@ -16,11 +18,19 @@ async function fetchOrderBooks(exchangeIds, symbol) {
 }
 
 async function fetchOrderBook(exchangeId, symbol) {
-  console.log(`Loading market data for exchange ${exchangeId}`);
-  const exchange = new ccxt[exchangeId]();
-  const markets = await exchange.loadMarkets();
-  const takerFee = exchange.markets[symbol].taker; 
-  const orderBook = await exchange.fetchL2OrderBook(symbol);
+  if (!exchangeCache[exchangeId]) {
+    console.log(`Loading market data for exchange ${exchangeId}`);
+    exchangeCache[exchangeId] = new ccxt[exchangeId]();
+    await execute(() => exchangeCache[exchangeId].loadMarkets());
+  }
+
+  const exchange = exchangeCache[exchangeId];
+  if (!exchange.markets[symbol]) {
+    return {};
+  }
+  
+  const orderBook = await execute(() => exchange.fetchL2OrderBook(symbol));
+  const takerFee = exchange.markets[symbol].taker;
 
   const mapOrderToObject = (order, fee) => ({
     exchangeId,
@@ -33,6 +43,34 @@ async function fetchOrderBook(exchangeId, symbol) {
     bids: orderBook.bids.map(o => mapOrderToObject(o, -takerFee)),
     asks: orderBook.asks.map(o => mapOrderToObject(o, takerFee)),
   };
+}
+
+async function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function execute(func, maxRetries = 10, sleepBeforeRequests = 1000) {
+  for (let numRetries = 0; numRetries < maxRetries; numRetries++) {
+    try {
+      await sleep(sleepBeforeRequests);
+      return await func();
+    } catch (e) {
+      // swallow connectivity exceptions only
+      if (e instanceof ccxt.DDoSProtection || e.message.includes ('ECONNRESET')) {
+        console.warn('[DDoS Protection Error] ' + e.message)
+      } else if (e instanceof ccxt.RequestTimeout) {
+        console.warn('[Timeout Error] ' + e.message)
+      } else if (e instanceof ccxt.AuthenticationError) {
+        console.warn('[Authentication Error] ' + e.message)
+      } else if (e instanceof ccxt.ExchangeNotAvailable) {
+        console.warn('[Exchange Not Available Error] ' + e.message)
+      } else if (e instanceof ccxt.ExchangeError) {
+        console.warn('[Exchange Error] ' + e.message)
+      } else {
+        throw e;
+      }
+    }
+  }
 }
 
 module.exports = fetchOrderBooks;
