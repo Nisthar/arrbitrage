@@ -1,5 +1,5 @@
 {
-  "name": "arbitross",
+  "name": "arr-bitrage",
   "version": "0.0.1",
   "description": "Crypto arbitrage robot",
   "main": "index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kennsippell/Arbitross.git"
+    "url": "git+https://github.com/kennsippell/arrbitrage.git"
   },
   "keywords": [
     "crypto",
@@ -17,11 +17,13 @@
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/kennsippell/Arbitross/issues"
+    "url": "https://github.com/kennsippell/arrbitrage/issues"
   },
-  "homepage": "https://github.com/kennsippell/Arbitross#readme",
+  "homepage": "https://github.com/kennsippell/arrbitrage#readme",
   "dependencies": {
-    "ccxt": "^1.10.621"
+    "as-table": "^1.0.31",
+    "ccxt": "^1.10.621",
+    "ololog": "^1.1.83"
   },
   "devDependencies": {
     "chai": "^4.1.2",
