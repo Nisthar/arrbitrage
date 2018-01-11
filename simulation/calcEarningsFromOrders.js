@@ -32,7 +32,8 @@ function calcEarningsFromOrders(orderBook) {
 
   return {
     deltaByExchange,
-    delta,
+    deltaA: delta.deltaA,
+    deltaB: delta.deltaB,
     totalVolumeInA,
     totalVolumeInB,
     meanOrderPrice,
