@@ -24,21 +24,21 @@ function calcEarningsFromOrders(orderBook) {
 
   const allOrders = orderBook.bids.concat(orderBook.asks);
   
-  const totalVolumeInA = allOrders.reduce((prev, curr) => prev += curr.amount, 0);
-  const meanOrderPrice = allOrders.reduce((prev, curr) => prev += curr.priceWithFee * curr.amount / totalVolumeInA, 0);
-  const totalVolumeInB = meanOrderPrice * totalVolumeInA;
-  const earnedValueInB = delta.deltaA * meanOrderPrice + delta.deltaB;
-  const marginOfVolumeTraded = (earnedValueInB / totalVolumeInB * 100) || 0;
+  const totalVolumeA = allOrders.reduce((prev, curr) => prev += curr.amount, 0);
+  const meanOrderPrice = allOrders.reduce((prev, curr) => prev += curr.priceWithFee * curr.amount / totalVolumeA, 0);
+  const totalVolumeB = meanOrderPrice * totalVolumeA;
+  const earnedValueB = delta.deltaA * meanOrderPrice + delta.deltaB;
+  const margin = (earnedValueB / totalVolumeB * 100) || 0;
 
   return {
     deltaByExchange,
     deltaA: delta.deltaA,
     deltaB: delta.deltaB,
-    totalVolumeInA,
-    totalVolumeInB,
+    totalVolumeA,
+    totalVolumeB,
     meanOrderPrice,
-    earnedValueInB,
-    marginOfVolumeTraded,
+    earnedValueB,
+    margin,
   };
 }
 

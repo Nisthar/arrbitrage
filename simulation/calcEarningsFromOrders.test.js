@@ -10,11 +10,11 @@ describe('Calculate Earnings From Orders', () => {
         deltaByExchange: {},
         deltaA: 0,
         deltaB: 0,
-        totalVolumeInA: 0,
-        totalVolumeInB: 0,
+        totalVolumeA: 0,
+        totalVolumeB: 0,
         meanOrderPrice: 0,
-        earnedValueInB: 0,
-        marginOfVolumeTraded: 0,
+        earnedValueB: 0,
+        margin: 0,
       });
     });
 
@@ -31,11 +31,11 @@ describe('Calculate Earnings From Orders', () => {
         },
         deltaA: 1,
         deltaB: 1.75,
-        totalVolumeInA: 9,
-        totalVolumeInB: 4.25,
+        totalVolumeA: 9,
+        totalVolumeB: 4.25,
         meanOrderPrice: 4.25/9,
-        earnedValueInB: 1.75 + 4.25/9,
-        marginOfVolumeTraded: 52.28758169934641,
+        earnedValueB: 1.75 + 4.25/9,
+        margin: 52.28758169934641,
       });
     });
   });
@@ -54,11 +54,11 @@ describe('Calculate Earnings From Orders', () => {
         },
         deltaA: 0,
         deltaB: 0.00006763065353434378,
-        totalVolumeInA: 2673.41253224,
-        totalVolumeInB: 0.05308027833459,
+        totalVolumeA: 2673.41253224,
+        totalVolumeB: 0.05308027833459,
         meanOrderPrice: 0.0000198548775,
-        earnedValueInB: 0.00006763065353434378,
-        marginOfVolumeTraded: 0.1274120175256729
+        earnedValueB: 0.00006763065353434378,
+        margin: 0.1274120175256729
       });
     });
 
@@ -76,11 +76,11 @@ describe('Calculate Earnings From Orders', () => {
         deltaA: 0,
         deltaB: 0.00004355902083532509,
 
-        totalVolumeInA: 162.260517,
-        totalVolumeInB: 0.02533660316858471,
+        totalVolumeA: 162.260517,
+        totalVolumeB: 0.02533660316858471,
         meanOrderPrice: 0.00015614767928161298,
-        earnedValueInB: 0.00004355902083532509,
-        marginOfVolumeTraded: 0.17192131299326924
+        earnedValueB: 0.00004355902083532509,
+        margin: 0.17192131299326924
       });
     });
   });
