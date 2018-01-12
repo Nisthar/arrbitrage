@@ -1,12 +1,18 @@
 const genericExchangePairExperiment = require('./genericExchangePairExperiment.js');
 
 const considerableHoldings = {};
-const cryptoToCryptoExchanges = ['allcoin', 'binance', 'bitbay', 'bitcoincoid', 'bitfinex2', 'bitflyer', 'bitlish', 'bitso', 'bitstamp', 'bitstamp', 'bittrex', 'bleutrade', 'btcexchange', 'btcmarkets', 'btcturk', 'bxinth', 'ccex', 'cex', 'cryptopia', 'dsx', 'exmo', 'gatecoin', 'gateio', 'gdax', 'gemini', 'hitbtc2', 'huobipro', 'kucoin', 'lakebtc', 'liqui', 'livecoin', 'mixcoins', 'poloniex', 'qryptos', 'quadrigacx', 'quoine', 'southxchange', 'therock', 'tidex', 'wex', 'zaif', 'zb'];
 
-const approvedMarkets = ['cryptopia', 'gateio', 'huobipro', 'liqui', 'quadrigacx', 'bleutrade'];
+/* Removed 'ccex', 'zb' */
+const cryptoToCryptoExchanges = [
+  'allcoin', 'binance', 'bitbay', 'bitcoincoid', 'bitfinex2', 'bitflyer', 'bitlish', 'bitso', 'bitstamp', 'bitstamp', 'bittrex', 'bleutrade', 'btcexchange', 'btcmarkets', 'btcturk', 'bxinth', 'cex', 
+  'cryptopia', 'dsx', 'exmo', 'gatecoin', 'gateio', 'gdax', 'gemini', 'hitbtc2', 'huobipro', 'kucoin', 'lakebtc', 'liqui', 'livecoin', 'mixcoins', 'poloniex', 'qryptos', 'quadrigacx', 'quoine', 
+  'southxchange', 'therock', 'tidex', 'wex', 'zaif'
+];
+
+const approvedMarkets = ['cryptopia', 'gateio', 'huobipro', 'liqui', 'quadrigacx', 'bleutrade', 'binance'];
 const heldCurrencies = [ 'NEO', 'BTC', 'ETH', 'BAT', 'AST', 'RCN', 'GNT', 'REP', 'GNO', 'STORJ', 'BNT', 'MTX', 'BTG', 'KIN', 'LTC', 'DOGE', 'XLM' ];
 const isAcceptedCurrencies = (symbol) => heldCurrencies.some(c => symbol.startsWith(`${c}/`)) && heldCurrencies.some(c => symbol.endsWith(`/${c}`));
-const isCryptoMarket = (symbol) => ['USD', 'CAD', 'EUR', 'NZD', 'SGD', 'RUB', 'RUR', 'AUD', 'GBP', 'HKD', 'JPY' ].some(c => !symbol.endsWith(`/${c}`));
+const isFiatMarket = (symbol) => ['USD', 'CAD', 'EUR', 'NZD', 'SGD', 'RUB', 'RUR', 'AUD', 'GBP', 'HKD', 'JPY' ].some(c => symbol.endsWith(`/${c}`));
 
 const configurations = {
   liqobi: {
@@ -28,16 +34,17 @@ const configurations = {
   all: async () => await genericExchangePairExperiment({ exchangeIds : process.argv.slice(3) }),
   c2c: async () => await genericExchangePairExperiment({
     exchangeIds: cryptoToCryptoExchanges,
-    symbolFilter: isCryptoMarket,
+    symbolFilter: s => !isFiatMarket(s),
     display: 'table',
   }),
   approved: async () => await genericExchangePairExperiment({
     exchangeIds: approvedMarkets,
-    symbolFilter: sym => isCryptoMarket(sym) && isAcceptedCurrencies(sym),
+    symbolFilter: sym => !isFiatMarket(sym) && isAcceptedCurrencies(sym),
+    display: 'table',
   }),
 };
 
-async function getConfig(name) {
+async function getExperimentConfiguration(name) {
   let config = configurations[name];
   if (typeof config === 'function') {
     const result = config.constructor.name === 'AsyncFunction' ? await config() : config();
@@ -52,4 +59,8 @@ async function getConfig(name) {
   return config;
 }
 
-module.exports = getConfig;
+module.exports = {
+  getExperimentConfiguration,
+  isFiatMarket,
+  heldCurrencies,
+};

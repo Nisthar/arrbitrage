@@ -31,7 +31,7 @@ const calcEarningsFromOrders = require('./calcEarningsFromOrders.js');
       const sellOn = Array.from(new Set(profitableOrders.bids.map(o => o.exchangeId)));
 
       if (experimentConfiguration.display === 'table') {
-        console.log(`${symbol}|${earnings.margin.toFixed(2)}%|${earnings.bestMargin.toFixed(2)}%|${earnings.totalVolumeB}|${buyOn}|${sellOn}`);
+        console.log(`${symbol}|${earnings.margin.toFixed(2)}%|${earnings.bestMargin.toFixed(2)}%|${earnings.totalVolumeB}|${profitableOrders.asks[0].price}|${profitableOrders.bids[0].price}|${buyOn}|${sellOn}`);
       } else {
         console.log(`${JSON.stringify({ symbol, trades, earnings }, null, 2)}`);
       }
