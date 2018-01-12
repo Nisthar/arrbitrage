@@ -23,6 +23,7 @@ const configurations = {
     symbols: [
       'BTG/BTC',
     ],
+    display: 'detailed',
   },
   all: async () => await genericExchangePairExperiment({ exchangeIds : process.argv.slice(3) }),
   c2c: async () => await genericExchangePairExperiment({

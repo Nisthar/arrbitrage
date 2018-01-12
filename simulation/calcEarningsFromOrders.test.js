@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const calcEarningsFromOrders = require('./calcEarningsFromOrders.js');
 
-describe('Calculate Earnings From Orders', () => {
+describe('Calculate earnings from orders', () => {
   describe('Unit tests', () => {
     it('Empty order book yields no profit', () => {
       const orderBook = { "asks": [], "bids": [] };
@@ -15,6 +15,7 @@ describe('Calculate Earnings From Orders', () => {
         meanOrderPrice: 0,
         earnedValueB: 0,
         margin: 0,
+        bestMargin: 0,
       });
     });
 
@@ -36,6 +37,7 @@ describe('Calculate Earnings From Orders', () => {
         meanOrderPrice: 4.25/9,
         earnedValueB: 1.75 + 4.25/9,
         margin: 52.28758169934641,
+        bestMargin: 200,
       });
     });
   });
@@ -58,7 +60,8 @@ describe('Calculate Earnings From Orders', () => {
         totalVolumeB: 0.05308027833459,
         meanOrderPrice: 0.0000198548775,
         earnedValueB: 0.00006763065353434378,
-        margin: 0.1274120175256729
+        margin: 0.1274120175256729,
+        bestMargin: 0.2551491257001015,
       });
     });
 
@@ -80,7 +83,8 @@ describe('Calculate Earnings From Orders', () => {
         totalVolumeB: 0.02533660316858471,
         meanOrderPrice: 0.00015614767928161298,
         earnedValueB: 0.00004355902083532509,
-        margin: 0.17192131299326924
+        margin: 0.17192131299326924,
+        bestMargin: 0.4021982396680515,
       });
     });
   });

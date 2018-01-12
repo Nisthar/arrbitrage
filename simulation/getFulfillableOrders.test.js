@@ -18,7 +18,7 @@ const mockExchangeTwo = {
 
 const mockTwoExchanges = Object.assign({}, mockExchangeOne, mockExchangeTwo);
 
-describe('Get Fulfillable Orders', () => {
+describe('Get fulfillable orders', () => {
   describe('Unit tests for single exchange', () => {
     it('No holdings yield no orders', () => {
       const holdings = { A: [ 0, 0 ] };
@@ -82,7 +82,7 @@ describe('Get Fulfillable Orders', () => {
       }
     };
       
-    describe('Mock Liqui + HerobiPro BAT/ETH Order Book', () => {
+    it('Mock Liqui + HerobiPro BAT/ETH Order Book', () => {
       const mockHoldings = {
         liqui: [ 17, 0.5 ],
         huobipro: [ 1353, 0.5 ],
