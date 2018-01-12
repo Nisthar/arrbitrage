@@ -2,13 +2,13 @@
 
 const ccxt = require ('ccxt');
 
-const { getExchange } = require('./fetchExchangeData');
+const { fetchExchange } = require('./fetchExchangeData');
 
 async function genericExchangePairExperiment(settings) {
   const { exchangeIds, symbolFilter } = settings;
   const exchanges = {};
   for (let id of exchangeIds) {
-    exchanges[id] = await getExchange(id);
+    exchanges[id] = await fetchExchange(id);
   }
   
   // get all unique symbols

@@ -1,5 +1,6 @@
-const getConfiguration = require('./experimentConfigurations.js');
+const { getExperimentConfiguration } = require('./experimentConfigurations.js');
 const { fetchOrderBooks } = require('./fetchExchangeData.js');
+const getHoldingsOnExchange = require('./getHoldingsOnExchange.js');
 const getFulfillableOrders = require('./getFulfillableOrders.js');
 const getProfitableOrders = require('./getProfitableOrders.js');
 const getTradesFromOrders = require('./getTradesFromOrders.js');
@@ -9,15 +10,18 @@ const calcEarningsFromOrders = require('./calcEarningsFromOrders.js');
   const experimentName = process.argv[2];
   console.log(`Running experiment ${experimentName}`);
 
-  const experimentConfiguration = await getConfiguration(experimentName);
+  const experimentConfiguration = await getExperimentConfiguration(experimentName);
   for (const symbol of experimentConfiguration.symbols) {
     /* Fetch the order books for the symbol from each exchange */
     /* Adjust each order book to accomodate for market fees */
     const orderBooks = await fetchOrderBooks(experimentConfiguration.exchangeIds, symbol);
 
+    /* Determine our current holdings on the market */
+    const holdings = !experimentConfiguration.infiniteHoldings ? await getHoldingsOnExchange(experimentConfiguration.exchangeIds, symbol) : undefined;
+
     /* Based on our holdings in the marketplace, take the fulfillable orders from each market's book */
     /* Merge the order books into one sorted order book */
-    const fulfillableOrderBook = getFulfillableOrders(orderBooks, experimentConfiguration.holdings);
+    const fulfillableOrderBook = getFulfillableOrders(orderBooks, holdings);
 
     /* Pull out the profitable order pairs */
     const profitableOrders = getProfitableOrders(fulfillableOrderBook);

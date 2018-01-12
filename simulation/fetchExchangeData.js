@@ -5,13 +5,16 @@ Uses ccxt to load market information for a given exchange.
 */
 
 const ccxt = require ('ccxt');
+const credentials = require('./../credentials.js');
 
 const exchangeCache = {};
+const balanceCache = {};
 
-async function getExchange(exchangeId) {
+async function fetchExchange(exchangeId) {
   if (!exchangeCache[exchangeId]) {
-    console.log(`Loading market data for exchange ${exchangeId}`);
-    exchangeCache[exchangeId] = new ccxt[exchangeId]();
+    console.log(`Fetching market data for exchange ${exchangeId}`);
+    const exchangeCredentials = credentials[exchangeId] || {};
+    exchangeCache[exchangeId] = new ccxt[exchangeId](exchangeCredentials);
     await execute(() => exchangeCache[exchangeId].loadMarkets());
   }
 
@@ -30,8 +33,24 @@ async function fetchOrderBooks(exchangeIds, symbol) {
   return exchanges;
 }
 
+async function fetchBalance(exchangeId) {
+  if (!balanceCache[exchangeId]) {
+    console.log(`Fetching balance on ${exchangeId}`);
+    const exchange = await fetchExchange(exchangeId);
+    const balance = await execute(() => exchange.fetchBalance());
+    if (balance && balance.free) {
+      balanceCache[exchangeId] = balance.free;
+    } else {
+      console.warn(`Unable to fetch balance for ${exchangeId}`)
+      balanceCache[exchangeId] = {};
+    }
+  }
+  
+  return balanceCache[exchangeId];
+}
+
 async function fetchOrderBook(exchangeId, symbol) {
-  const exchange = await getExchange(exchangeId);
+  const exchange = await fetchExchange(exchangeId);
   if (!exchange.markets[symbol]) {
     return {};
   }
@@ -86,6 +105,7 @@ async function execute(func, maxRetries = 10, sleepBeforeRequests = 200) {
 }
 
 module.exports = {
-  getExchange,
+  fetchExchange,
+  fetchBalance,
   fetchOrderBooks,
 };

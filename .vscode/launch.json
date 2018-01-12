@@ -9,7 +9,7 @@
       "request": "launch",
       "name": "Launch Program",
       "program": "${workspaceRoot}/simulation/index.js",
-      "args": ["all", "gemini", "gdax"],
+      "args": ["liqobi"],
       "cwd": "${workspaceRoot}"
     },
     {
