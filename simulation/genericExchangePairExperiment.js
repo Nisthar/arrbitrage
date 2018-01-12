@@ -4,21 +4,21 @@ const ccxt = require ('ccxt');
 
 const { getExchange } = require('./fetchExchangeData');
 
-async function genericExchangePairExperiment() {
-  const ids = process.argv.slice(3);
-  const exchangeIds = ids.reduce(async (prev, id) => {
-    prev[id] = await getExchange(id);
-    return prev;
-  }, {});
-
+async function genericExchangePairExperiment(settings) {
+  const { exchangeIds, symbolFilter } = settings;
+  const exchanges = {};
+  for (let id of exchangeIds) {
+    exchanges[id] = await getExchange(id);
+  }
+  
   // get all unique symbols
-  const uniqueSymbols = ccxt.unique (ccxt.flatten (ids.map (id => exchangeIds[id].symbols)));
+  const uniqueSymbols = ccxt.unique (ccxt.flatten (exchangeIds.map (id => exchanges[id].symbols))).filter(s => !symbolFilter || symbolFilter(s));
 
   // filter out symbols that are not present on at least two exchanges
   const arbitrableSymbols = uniqueSymbols
     .filter (symbol => 
-        ids.filter (id => 
-            (exchangeIds[id].symbols.indexOf (symbol) >= 0)).length > 1)
+        exchangeIds.filter (id => 
+            (exchanges[id].symbols.indexOf (symbol) >= 0)).length > 1)
     .sort ((id1, id2) => (id1 > id2) ? 1 : ((id2 > id1) ? -1 : 0));
 
   return {

@@ -10,10 +10,14 @@ function getFulfillableOrders(exchanges, holdings) {
     asks: [],
   };
 
+  const fakeHoldings = [ 1000000, 1000000 ];
+
   for (let id of ids) {
     const exchange = exchanges[id];
-    result.bids = result.bids.concat(determineFulfillableOrders(exchange.bids, holdings[id][0], 'bid'));
-    result.asks = result.asks.concat(determineFulfillableOrders(exchange.asks, holdings[id][1], 'ask'));
+    if (exchange && exchange.bids && exchange.asks && (exchange.bids.length > 0 || exchange.asks.length > 0)) {
+      result.bids = result.bids.concat(determineFulfillableOrders(exchange.bids, fakeHoldings[0], 'bid'));
+      result.asks = result.asks.concat(determineFulfillableOrders(exchange.asks, fakeHoldings[1], 'ask'));
+    }
   }
 
   result.bids.sort((a,b) => b.priceWithFee - a.priceWithFee);

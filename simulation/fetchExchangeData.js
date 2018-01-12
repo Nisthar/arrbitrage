@@ -21,7 +21,10 @@ async function getExchange(exchangeId) {
 async function fetchOrderBooks(exchangeIds, symbol) {
   const exchanges = {};
   for (let id of exchangeIds) {
-    exchanges[id] = await fetchOrderBook(id, symbol);
+    const exchange = await fetchOrderBook(id, symbol);
+    if (exchange) {
+      exchanges[id] = exchange;
+    } 
   }
 
   return exchanges;
@@ -34,6 +37,8 @@ async function fetchOrderBook(exchangeId, symbol) {
   }
   
   const orderBook = await execute(() => exchange.fetchL2OrderBook(symbol));
+  if (!orderBook) return undefined;
+
   const takerFee = exchange.markets[symbol].taker;
 
   const mapOrderToObject = (order, fee) => ({
@@ -53,7 +58,7 @@ async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function execute(func, maxRetries = 10, sleepBeforeRequests = 1000) {
+async function execute(func, maxRetries = 10, sleepBeforeRequests = 200) {
   for (let numRetries = 0; numRetries < maxRetries; numRetries++) {
     try {
       await sleep(sleepBeforeRequests);
@@ -61,20 +66,23 @@ async function execute(func, maxRetries = 10, sleepBeforeRequests = 1000) {
     } catch (e) {
       // swallow connectivity exceptions only
       if (e instanceof ccxt.DDoSProtection || e.message.includes ('ECONNRESET')) {
-        console.warn('[DDoS Protection Error] ' + e.message)
+        // console.warn('[DDoS Protection Error] ' + e.message)
       } else if (e instanceof ccxt.RequestTimeout) {
-        console.warn('[Timeout Error] ' + e.message)
+        // console.warn('[Timeout Error] ' + e.message)
       } else if (e instanceof ccxt.AuthenticationError) {
-        console.warn('[Authentication Error] ' + e.message)
+        // console.warn('[Authentication Error] ' + e.message)
       } else if (e instanceof ccxt.ExchangeNotAvailable) {
-        console.warn('[Exchange Not Available Error] ' + e.message)
+        // console.warn('[Exchange Not Available Error] ' + e.message)
       } else if (e instanceof ccxt.ExchangeError) {
-        console.warn('[Exchange Error] ' + e.message)
+        // console.warn('[Exchange Error] ' + e.message)
       } else {
         throw e;
       }
     }
   }
+
+  return undefined;
+  throw 'Failed to execute function';
 }
 
 module.exports = {

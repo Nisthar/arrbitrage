@@ -23,8 +23,12 @@ const calcEarningsFromOrders = require('./calcEarningsFromOrders.js');
 
     /* Calculate the profit that will be made and the percent margin on stake */
     if (profitableOrders.asks.length > 0) {
+      const buyOn = Array.from(new Set(profitableOrders.asks.map(o => o.exchangeId)));
+      const sellOn = Array.from(new Set(profitableOrders.bids.map(o => o.exchangeId)));
+
       const earnings = calcEarningsFromOrders(profitableOrders);
-      console.log(`${symbol}: ${earnings.margin.toFixed(2)}% on ${earnings.totalVolumeB}`);
+      console.log(`${symbol} ${JSON.stringify(earnings, null, 2)} ${JSON.stringify(profitableOrders, null, 2)}`);
+      console.log(`${symbol}|${earnings.margin.toFixed(2)}%|${earnings.bestMargin.toFixed(2)}%|${earnings.totalVolumeB}|${buyOn}|${sellOn}`);
     }
   }
 })();

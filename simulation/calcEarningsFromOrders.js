@@ -29,6 +29,7 @@ function calcEarningsFromOrders(orderBook) {
   const totalVolumeB = meanOrderPrice * totalVolumeA;
   const earnedValueB = delta.deltaA * meanOrderPrice + delta.deltaB;
   const margin = (earnedValueB / totalVolumeB * 100) || 0;
+  const bestMargin = (orderBook.bids[0].priceWithFee - orderBook.asks[0].priceWithFee) / orderBook.asks[0].priceWithFee * 100;  
 
   return {
     deltaByExchange,
@@ -39,6 +40,7 @@ function calcEarningsFromOrders(orderBook) {
     meanOrderPrice,
     earnedValueB,
     margin,
+    bestMargin,
   };
 }
 
