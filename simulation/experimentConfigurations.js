@@ -3,8 +3,8 @@ const genericExchangePairExperiment = require('./genericExchangePairExperiment.j
 const considerableHoldings = {};
 const cryptoToCryptoExchanges = ['allcoin', 'binance', 'bitbay', 'bitcoincoid', 'bitfinex2', 'bitflyer', 'bitlish', 'bitso', 'bitstamp', 'bitstamp', 'bittrex', 'bleutrade', 'btcexchange', 'btcmarkets', 'btcturk', 'bxinth', 'ccex', 'cex', 'cryptopia', 'dsx', 'exmo', 'gatecoin', 'gateio', 'gdax', 'gemini', 'hitbtc2', 'huobipro', 'kucoin', 'lakebtc', 'liqui', 'livecoin', 'mixcoins', 'poloniex', 'qryptos', 'quadrigacx', 'quoine', 'southxchange', 'therock', 'tidex', 'wex', 'zaif', 'zb'];
 
-const approvedMarkets = ['cryptopia', 'gateio', 'huobipro', 'liqui', 'quadrigacx'];
-const heldCurrencies = [ 'NEO', 'BTC', 'ETH', 'BAT', 'AST', 'RCN', 'GNT', 'REP', 'GNO', 'STORJ', 'BNT', 'MTX', 'BCD', 'BTG' ];
+const approvedMarkets = ['cryptopia', 'gateio', 'huobipro', 'liqui', 'quadrigacx', 'bleutrade'];
+const heldCurrencies = [ 'NEO', 'BTC', 'ETH', 'BAT', 'AST', 'RCN', 'GNT', 'REP', 'GNO', 'STORJ', 'BNT', 'MTX', 'BTG', 'KIN', 'LTC', 'DOGE', 'XLM' ];
 const isAcceptedCurrencies = (symbol) => heldCurrencies.some(c => symbol.startsWith(`${c}/`)) && heldCurrencies.some(c => symbol.endsWith(`/${c}`));
 const isCryptoMarket = (symbol) => ['USD', 'CAD', 'EUR', 'NZD', 'SGD', 'RUB', 'RUR', 'AUD', 'GBP', 'HKD', 'JPY' ].some(c => !symbol.endsWith(`/${c}`));
 
@@ -28,7 +28,8 @@ const configurations = {
   all: async () => await genericExchangePairExperiment({ exchangeIds : process.argv.slice(3) }),
   c2c: async () => await genericExchangePairExperiment({
     exchangeIds: cryptoToCryptoExchanges,
-    symbolFilter: isCryptoMarket
+    symbolFilter: isCryptoMarket,
+    display: 'table',
   }),
   approved: async () => await genericExchangePairExperiment({
     exchangeIds: approvedMarkets,

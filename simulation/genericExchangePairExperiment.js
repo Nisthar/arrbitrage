@@ -21,10 +21,10 @@ async function genericExchangePairExperiment(settings) {
             (exchanges[id].symbols.indexOf (symbol) >= 0)).length > 1)
     .sort ((id1, id2) => (id1 > id2) ? 1 : ((id2 > id1) ? -1 : 0));
 
-  return {
+  return Object.assign(settings, {
     exchangeIds,
     symbols: arbitrableSymbols,
-  };
+  });
 }
 
 module.exports = genericExchangePairExperiment;

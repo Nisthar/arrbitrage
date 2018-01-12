@@ -3,7 +3,7 @@ const getProfitableOrders = require('./getProfitableOrders.js');
 const genOrder = (price, amount) => ({amount, priceWithFee: price});
 const emptyOrder = { asks: [], bids: [] };
 
-describe('Get Profitable Orders', () => {
+describe('Get profitable orders', () => {
   describe('Unit tests for single exchange', () => {
     it('Empty orderbook has no profitable orders', () => {
       const orderBook = emptyOrder;

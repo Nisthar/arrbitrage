@@ -2,6 +2,7 @@ const getConfiguration = require('./experimentConfigurations.js');
 const { fetchOrderBooks } = require('./fetchExchangeData.js');
 const getFulfillableOrders = require('./getFulfillableOrders.js');
 const getProfitableOrders = require('./getProfitableOrders.js');
+const getTradesFromOrders = require('./getTradesFromOrders.js');
 const calcEarningsFromOrders = require('./calcEarningsFromOrders.js');
 
 (async function main() {
@@ -21,18 +22,18 @@ const calcEarningsFromOrders = require('./calcEarningsFromOrders.js');
     /* Pull out the profitable order pairs */
     const profitableOrders = getProfitableOrders(fulfillableOrderBook);
 
-    /* Calculate the profit that will be made and the percent margin on stake */
-    if (profitableOrders.asks.length > 0) {
+    if (profitableOrders.asks && profitableOrders.asks.length > 0) {
+      /* Calculate the profit that will be made and the percent margin on stake */
+      const earnings = calcEarningsFromOrders(profitableOrders);
+      const trades = getTradesFromOrders(profitableOrders);
+
       const buyOn = Array.from(new Set(profitableOrders.asks.map(o => o.exchangeId)));
       const sellOn = Array.from(new Set(profitableOrders.bids.map(o => o.exchangeId)));
 
-      const earnings = calcEarningsFromOrders(profitableOrders);
-      if (experimentConfiguration.display === 'detailed') {
-        console.log(`${JSON.stringify({ symbol, earnings, profitableOrders}, null, 2)}`);
-      } else if (experimentConfiguration.display === 'table') {
+      if (experimentConfiguration.display === 'table') {
         console.log(`${symbol}|${earnings.margin.toFixed(2)}%|${earnings.bestMargin.toFixed(2)}%|${earnings.totalVolumeB}|${buyOn}|${sellOn}`);
       } else {
-        console.log(`${JSON.stringify({ symbol, earnings }, null, 2)}`);
+        console.log(`${JSON.stringify({ symbol, trades, earnings }, null, 2)}`);
       }
     }
   }
