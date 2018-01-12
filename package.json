@@ -4,7 +4,8 @@
   "description": "Crypto arbitrage robot",
   "main": "index.js",
   "scripts": {
-    "test": "mocha ./**/*.test.js --watch"
+    "test": "mocha ./**/*.test.js --watch",
+    "holdings": "node currentHoldings"
   },
   "repository": {
     "type": "git",
