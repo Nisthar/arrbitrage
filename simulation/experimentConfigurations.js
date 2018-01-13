@@ -9,8 +9,9 @@ const cryptoToCryptoExchanges = [
   'southxchange', 'therock', 'tidex', 'wex', 'zaif'
 ];
 
-const exchangesWithAccounts = ['cryptopia', 'gateio', 'huobipro', 'liqui', 'quadrigacx', 'bleutrade', 'binance'];
-const heldCurrencies = ['NEO', 'BTC', 'ETH', 'BAT', 'AST', 'RCN', 'GNT', 'REP', 'GNO', 'STORJ', 'BNT', 'MTX', 'BTG', 'KIN', 'LTC', 'DOGE', 'XLM', 'USDT' ];
+// Removed 'cryptopia', 'quadrigacx',
+const exchangesWithAccounts = ['gateio', 'huobipro', 'liqui', 'bleutrade', 'binance'];
+const heldCurrencies = ['NEO', 'BTC', 'ETH', 'BAT', 'AST', 'RCN', 'GNT', 'REP', 'GNO', 'STORJ', 'BNT', 'MTX', 'BTG', 'KIN', 'LTC', 'DOGE', 'XLM', 'USDT', 'XMR' ];
 const isAcceptedCurrencies = (symbol) => heldCurrencies.some(c => symbol.startsWith(`${c}/`)) && heldCurrencies.some(c => symbol.endsWith(`/${c}`));
 const isFiatMarket = (symbol) => ['USD', 'CAD', 'EUR', 'NZD', 'SGD', 'RUB', 'RUR', 'AUD', 'GBP', 'HKD', 'JPY' ].some(c => symbol.endsWith(`/${c}`));
 
@@ -25,7 +26,7 @@ async function getExperimentConfiguration(name) {
       ],
       infiniteHoldings: true,
     },
-    all: async () => await genericExchangePairExperiment({ exchangeIds : process.argv.slice(3) }),
+    all: async () => await genericExchangePairExperiment({ exchangeIds : process.argv.length > 2 && process.argv.slice(3) }),
     c2c: async () => await genericExchangePairExperiment({
       exchangeIds: cryptoToCryptoExchanges,
       symbolFilter: s => !isFiatMarket(s),
@@ -39,9 +40,8 @@ async function getExperimentConfiguration(name) {
       infiniteHoldings: true,
     }),
     deep: {
-      exchangeIds: process.argv[3].split(','),
-      symbols: process.argv[4].split(','),
-      infiniteHoldings: true,
+      exchangeIds: process.argv.length > 3 && process.argv[3].split(','),
+      symbols: process.argv.length > 3 && process.argv[4].split(','),
     },
     real: async () => await genericExchangePairExperiment({
       exchangeIds: exchangesWithAccounts,
@@ -49,7 +49,7 @@ async function getExperimentConfiguration(name) {
       display: 'table',
     }),
   };
-  
+
   let config = configurations[name];
   if (typeof config === 'function') {
     const result = config.constructor.name === 'AsyncFunction' ? await config() : config();
