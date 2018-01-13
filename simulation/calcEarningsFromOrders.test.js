@@ -1,12 +1,14 @@
 const { expect } = require('chai');
 const calcEarningsFromOrders = require('./calcEarningsFromOrders.js');
 
+const stripSummary = (obj) => { delete obj['summary']; return obj; };
+
 describe('Calculate earnings from orders', () => {
   describe('Unit tests', () => {
     it('Empty order book yields no profit', () => {
       const orderBook = { "asks": [], "bids": [] };
       const result = calcEarningsFromOrders(orderBook);
-      expect(result).to.deep.eq({
+      expect(stripSummary(result)).to.deep.eq({
         deltaByExchange: {},
         deltaA: 0,
         deltaB: 0,
@@ -25,7 +27,7 @@ describe('Calculate earnings from orders', () => {
         "bids": [{exchangeId:"liqui", amount: 4, priceWithFee: 0.75 }]
       };
       const result = calcEarningsFromOrders(orderBook);
-      expect(result).to.deep.eq({
+      expect(stripSummary(result)).to.deep.eq({
         deltaByExchange: {
           liqui: { deltaA: -4, deltaB: 3 },
           huobipro: { deltaA: 5, deltaB: -1.25 }
@@ -49,7 +51,7 @@ describe('Calculate earnings from orders', () => {
         "bids":[{exchangeId:"liqui","price":0.00001993,amount:1336.70626612,priceWithFee:0.000019880175}]
       };
       const result = calcEarningsFromOrders(orderBook);
-      expect(result).to.deep.eq({
+      expect(stripSummary(result)).to.deep.eq({
         deltaByExchange: {
           liqui: { deltaA: -1336.70626612, deltaB: 0.026573954494062173 },
           huobipro: { deltaA: 1336.70626612, deltaB: -0.02650632384052783 }
@@ -71,7 +73,7 @@ describe('Calculate earnings from orders', () => {
         "bids":[{exchangeId:"liqui","price":0.00015686,amount:1.57799655,priceWithFee:0.00015646785000000002},{exchangeId:"liqui","price":0.00015683,amount:2.29200345,priceWithFee:0.000156437925},{exchangeId:"liqui","price":0.00015683,amount:16.59455122,priceWithFee:0.000156437925},{exchangeId:"liqui","price":0.0001568,amount:60.66570728,priceWithFee:0.000156408}]
       };
       const result = calcEarningsFromOrders(orderBook);
-      expect(result).to.deep.eq({
+      expect(stripSummary(result)).to.deep.eq({
         deltaByExchange: {
           liqui: { deltaA: -81.1302585, deltaB: 0.012690081094710016 },
           huobipro: { deltaA: 81.1302585, deltaB: -0.012646522073874691 }

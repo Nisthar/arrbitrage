@@ -29,18 +29,25 @@ function calcEarningsFromOrders(orderBook) {
   const totalVolumeB = meanOrderPrice * totalVolumeA;
   const earnedValueB = delta.deltaA * meanOrderPrice + delta.deltaB;
   const margin = (earnedValueB / totalVolumeB * 100) || 0;
-  const bestMargin = orderBook.bids[0] && orderBook.asks[0] && (orderBook.bids[0].priceWithFee - orderBook.asks[0].priceWithFee) / orderBook.asks[0].priceWithFee * 100 || 0;  
+  const bestMargin = orderBook.bids[0] && orderBook.asks[0] && (orderBook.bids[0].priceWithFee - orderBook.asks[0].priceWithFee) / orderBook.asks[0].priceWithFee * 100 || 0;
 
   return {
     deltaByExchange,
     deltaA: delta.deltaA,
     deltaB: delta.deltaB,
+    earnedValueB,
     totalVolumeA,
     totalVolumeB,
-    meanOrderPrice,
-    earnedValueB,
     margin,
     bestMargin,
+    meanOrderPrice,
+    summary: {
+      totalVolumeA,
+      meanOrderPrice,
+      earnedValueB,
+      margin,
+      bestMargin,
+    },
   };
 }
 
