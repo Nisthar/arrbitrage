@@ -11,7 +11,9 @@ const cryptoToCryptoExchanges = [
 
 // Removed 'cryptopia', 'quadrigacx',
 const exchangesWithAccounts = ['gateio', 'huobipro', 'liqui', 'bleutrade', 'binance'];
-const heldCurrencies = ['NEO', 'BTC', 'ETH', 'BAT', 'AST', 'RCN', 'GNT', 'REP', 'GNO', 'STORJ', 'BNT', 'MTX', 'BTG', 'KIN', 'LTC', 'DOGE', 'XLM', 'USDT', 'XMR' ];
+
+// const heldCurrencies = ['NEO', 'BTC', 'ETH', 'BAT', 'AST', 'RCN', 'GNT', 'REP', 'GNO', 'STORJ', 'BNT', 'MTX', 'BTG', 'KIN', 'LTC', 'DOGE', 'XLM', 'USDT', 'XMR' ];
+const heldCurrencies = ['AST', 'BAT', 'BCD', 'BNT', 'BTC', 'BTG', 'ETH', 'GNT', 'REP', 'STORJ'];
 const isAcceptedCurrencies = (symbol) => heldCurrencies.some(c => symbol.startsWith(`${c}/`)) && heldCurrencies.some(c => symbol.endsWith(`/${c}`));
 const isFiatMarket = (symbol) => ['USD', 'CAD', 'EUR', 'NZD', 'SGD', 'RUB', 'RUR', 'AUD', 'GBP', 'HKD', 'JPY' ].some(c => symbol.endsWith(`/${c}`));
 
