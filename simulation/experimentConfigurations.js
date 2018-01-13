@@ -19,36 +19,38 @@ const isFiatMarket = (symbol) => ['USD', 'CAD', 'EUR', 'NZD', 'SGD', 'RUB', 'RUR
 
 async function getExperimentConfiguration(name) {
   const configurations = {
-    liqobi: {
-      exchangeIds: [ 'liqui', 'huobipro' ],
-      holdings: considerableHoldings,
-      symbols: [
-        'AST/BTC', 'BAT/BTC', 'BAT/ETH', 'BCH/BTC', 'BCH/USDT', 'BTC/USDT', 'CVC/BTC', 'CVC/ETH', 'CVC/USDT', 'DASH/BTC', 'DASH/USDT', 'DGD/BTC', 'DGD/ETH', 'EOS/BTC', 'EOS/ETH', 'EOS/USDT', 'ETH/BTC', 'ETH/USDT', 'GNT/BTC', 'GNT/ETH', 'GNT/USDT', 'KNC/BTC', 
-        'LTC/BTC', 'LTC/USDT', 'MANA/BTC', 'MANA/ETH', 'MCO/BTC', 'MCO/ETH', 'OMG/BTC', 'OMG/ETH', 'OMG/USDT', 'PAY/BTC', 'PAY/ETH', 'QTUM/BTC', 'QTUM/ETH', 'QTUM/USDT', 'REQ/BTC', 'REQ/ETH', 'SALT/BTC', 'SALT/ETH', 'SNT/BTC', 'SNT/USDT', 'STORJ/BTC', 'STORJ/USDT', 'TNT/BTC', 'TNT/ETH', 'VEN/BTC', 'VEN/ETH', 'ZRX/BTC'
-      ],
+    scan: async () => await genericExchangePairExperiment({
+      exchangeIds : process.argv.length > 2 && process.argv.slice(3),
+      logSummaryTable: true,
       infiniteHoldings: true,
-    },
-    all: async () => await genericExchangePairExperiment({ exchangeIds : process.argv.length > 2 && process.argv.slice(3) }),
-    c2c: async () => await genericExchangePairExperiment({
+      logTradeDescriptions: true,
+    }),
+    scanc2c: async () => await genericExchangePairExperiment({
       exchangeIds: cryptoToCryptoExchanges,
       symbolFilter: s => !isFiatMarket(s),
-      display: 'table',
+      logSummaryTable: true,
       infiniteHoldings: true,
+      logTradeDescriptions: true,
     }),
     infinite: async () => await genericExchangePairExperiment({
       exchangeIds: exchangesWithAccounts,
       symbolFilter: sym => !isFiatMarket(sym) && isAcceptedCurrencies(sym),
-      display: 'table',
+      logSummaryTable: true,
       infiniteHoldings: true,
+      logTradeDescriptions: true,
     }),
     deep: {
       exchangeIds: process.argv.length > 3 && process.argv[3].split(','),
       symbols: process.argv.length > 3 && process.argv[4].split(','),
+      logDetailedTrades: true,
+      logTradeDescriptions: true,
     },
     real: async () => await genericExchangePairExperiment({
       exchangeIds: exchangesWithAccounts,
       symbolFilter: sym => !isFiatMarket(sym) && isAcceptedCurrencies(sym),
-      display: 'table',
+      logDetailedTrades: false,
+      logTradeDescriptions: true,
+      logSummaryTable: false,
     }),
   };
 
@@ -62,7 +64,6 @@ async function getExperimentConfiguration(name) {
     config = result;
   }
   
-  console.log(`Executing experiment with configuration: ${JSON.stringify(config, null, 2)}`);
   return config;
 }
 

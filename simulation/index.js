@@ -11,13 +11,9 @@ const asTable = require('as-table').configure({ delimiter: '|', print: obj => !N
 
 (async function main() {
   const experimentName = process.argv[2];
-  console.log(`Running experiment ${experimentName}`);
 
   const experimentConfiguration = await getExperimentConfiguration(experimentName);
-  const summaries = [];
   for (const symbol of experimentConfiguration.symbols) {
-    console.log(`Arrr-bitrations for ${symbol}`);
-  
     /* Fetch the order books for the symbol from each exchange */
     /* Adjust each order book to accomodate for market fees */
     const orderBooks = await fetchOrderBooks(experimentConfiguration.exchangeIds, symbol);
@@ -36,23 +32,36 @@ const asTable = require('as-table').configure({ delimiter: '|', print: obj => !N
       /* Calculate the profit that will be made and the percent margin on stake */
       const earnings = calcEarningsFromOrders(profitableOrders);
       const trades = getTradesFromOrders(profitableOrders);
-      const buyOn = trades.buy.map(t => t.exchangeId);
-      const sellOn = trades.sell.map(t => t.exchangeId);
 
-      const approximateValueOfCurrencyB = cryptoValuation[holdings.currencyB];
-      summaries.push(Object.assign({ symbol }, earnings.summary, {
-        buyOn,
-        sellOn,
-        earnedUsd: approximateValueOfCurrencyB && approximateValueOfCurrencyB * earnings.earnedValueB
-      }));
-
-      if (experimentConfiguration.display !== 'table') {
-        console.log(`${JSON.stringify({ symbol, trades, earnings }, null, 2)}`);
-      }
+      saveAndLogArrbitrage(symbol, earnings, holdings, trades, experimentConfiguration);
     }
   }
   
-  console.log(asTable(summaries));
+  if (experimentConfiguration.logSummaryTable) {
+    console.log(asTable(summaries));
+  }
 })();
+
+const summaries = [];
+function saveAndLogArrbitrage(symbol, earnings, holdings, trades, { logDetailedTrades, logTradeDescriptions }) {
+  const buyOn = trades.buy.map(t => t.exchangeId);
+  const sellOn = trades.sell.map(t => t.exchangeId);
+
+  const approximateValueOfCurrencyB = cryptoValuation[holdings.currencyB];
+  const summary = Object.assign({ symbol }, earnings.summary, {
+    buyOn,
+    sellOn,
+    earnedUsd: approximateValueOfCurrencyB && approximateValueOfCurrencyB * earnings.earnedValueB
+  });
+  summaries.push(summary);
+
+  if (logDetailedTrades) {
+    console.log(`${JSON.stringify({ symbol, trades, earnings }, null, 2)}`);
+  }
+
+  if (logTradeDescriptions) {
+    console.log(`Buy/Sell ${(earnings.totalVolumeA / 2).toPrecision(2)} ${holdings.currencyA} on ${buyOn}/${sellOn} to realize gain of ${earnings.earnedValueB.toPrecision(2)}${holdings.currencyB} (~$${summary.earnedUsd.toFixed(2)} USD)`);
+  }
+}
 
 process.on('unhandledRejection', r => console.log(r));

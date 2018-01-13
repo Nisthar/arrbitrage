@@ -12,9 +12,9 @@ const balanceCache = {};
 
 async function fetchExchange(exchangeId) {
   if (!exchangeCache[exchangeId]) {
-    console.log(`Fetching market data for exchange ${exchangeId}`);
     const exchangeCredentials = credentials[exchangeId] || {};
     exchangeCache[exchangeId] = new ccxt[exchangeId](exchangeCredentials);
+    exchangeCache[exchangeId].enableRateLimit = true;
     await execute(() => exchangeCache[exchangeId].loadMarkets());
   }
 
@@ -35,7 +35,6 @@ async function fetchOrderBooks(exchangeIds, symbol) {
 
 async function fetchBalance(exchangeId) {
   if (!balanceCache[exchangeId]) {
-    console.log(`Fetching balance on ${exchangeId}`);
     const exchange = await fetchExchange(exchangeId);
     const balance = await execute(() => exchange.fetchBalance());
     if (balance && balance.free) {
