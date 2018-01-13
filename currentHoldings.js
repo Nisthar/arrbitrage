@@ -1,7 +1,7 @@
 const { exchangesWithAccounts } = require('./simulation/experimentConfigurations.js');
 const { fetchBalance } = require('./simulation/fetchExchangeData.js');
 
-const asTable = require('as-table');
+const asTable = require('as-table').configure({ delimiter: '|' });
 
 (async function main() {
   const rows = [];
@@ -13,14 +13,16 @@ const asTable = require('as-table');
     }
   }
 
-  for (const exchangeId of exchangesWithAccounts) {
+  for (const exchangeId of exchangesWithAccounts.sort()) {
     const row = { exchangeId };
     const balance = await fetchBalance(exchangeId);
     currencies.forEach(c => row[c] = balance[c]);
     rows.push(row);
   }
 
-  console.log(asTable(rows));
+  const header = [ 'exchangeId', ...Array.from(currencies).sort() ];
+  const sortedRows = rows.map(r => header.map(h => r[h]));
+  console.log(asTable([ header, ...sortedRows ]));
 })();
 
 process.on('unhandledRejection', r => console.log(r));
