@@ -52,9 +52,7 @@ const asTable = require('as-table').configure({ delimiter: '|', print: obj => !N
     }
   }
   
-  if (experimentConfiguration.display === 'table') {
-    console.log(asTable(summaries));
-  }
+  console.log(asTable(summaries));
 })();
 
 process.on('unhandledRejection', r => console.log(r));

@@ -6,7 +6,8 @@
   "scripts": {
     "test": "mocha ./**/*.test.js --watch",
     "holdings": "node currentHoldings",
-    "ssh": "ssh -i ./ec2.pem ec2-user@ec2-18-218-145-48.us-east-2.compute.amazonaws.com"
+    "ssh": "ssh -i ./ec2.pem ec2-user@ec2-18-218-145-48.us-east-2.compute.amazonaws.com",
+    "editcron": "crontab -e"
   },
   "repository": {
     "type": "git",
