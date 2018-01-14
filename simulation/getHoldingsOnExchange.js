@@ -1,10 +1,10 @@
 const { fetchBalance } = require('./fetchExchangeData.js');
 
-async function getHoldingsOnExchange(exchangeIds, currencies) {
+async function getHoldingsOnExchange(exchangeIds, currencies, fetch = fetchBalance) {
   const [ currencyA, currencyB ] = currencies;
   const result = { currencyA, currencyB };
   for (let exchangeId of exchangeIds) {
-    const balance = await fetchBalance(exchangeId) || {};
+    const balance = await fetch(exchangeId) || {};
     result[exchangeId] = [
       balance[currencyA] || 0,
       balance[currencyB] || 0
