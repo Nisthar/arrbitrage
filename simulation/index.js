@@ -19,7 +19,8 @@ const asTable = require('as-table').configure({ delimiter: '|', print: obj => !N
     const orderBooks = await fetchOrderBooks(experimentConfiguration.exchangeIds, symbol);
 
     /* Determine our current holdings on the market */
-    const holdings = !experimentConfiguration.infiniteHoldings ? await getHoldingsOnExchange(experimentConfiguration.exchangeIds, symbol) : undefined;
+    const currencies = parseCurrenciesFromSymbol(symbol);
+    const holdings = !experimentConfiguration.infiniteHoldings ? await getHoldingsOnExchange(experimentConfiguration.exchangeIds, currencies) : undefined;
 
     /* Based on our holdings in the marketplace, take the fulfillable orders from each market's book */
     /* Merge the order books into one sorted order book */
@@ -33,7 +34,7 @@ const asTable = require('as-table').configure({ delimiter: '|', print: obj => !N
       const earnings = calcEarningsFromOrders(profitableOrders);
       const trades = getTradesFromOrders(profitableOrders);
 
-      saveAndLogArrbitrage(symbol, earnings, holdings, trades, experimentConfiguration);
+      saveAndLogArrbitrage(symbol, earnings, holdings, currencies, trades, experimentConfiguration);
     }
   }
   
@@ -43,7 +44,7 @@ const asTable = require('as-table').configure({ delimiter: '|', print: obj => !N
 })();
 
 const summaries = [];
-function saveAndLogArrbitrage(symbol, earnings, holdings, trades, { logDetailedTrades, logTradeDescriptions }) {
+function saveAndLogArrbitrage(symbol, earnings, holdings, currencies, trades, { logDetailedTrades, logTradeDescriptions }) {
   const buyOn = trades.buy.map(t => t.exchangeId);
   const sellOn = trades.sell.map(t => t.exchangeId);
 
@@ -61,7 +62,7 @@ function saveAndLogArrbitrage(symbol, earnings, holdings, trades, { logDetailedT
 
   if (logTradeDescriptions) {
     console.log(`Earn ~$${summary.earnedUsd.toFixed(2)} USD at ${earnings.bestMargin.toFixed(1)}% - ${earnings.margin.toFixed(1)}% on ${symbol}
-Buy ${(earnings.totalVolumeA / 2).toPrecision(2)} ${holdings.currencyA} on ${buyOn}
+Buy ${(earnings.totalVolumeA / 2).toPrecision(2)} ${currencies[0]} on ${buyOn}
 Sell the same on ${sellOn}`);
 
     console.log(`Details: node simulation deep ${[ ...buyOn, ...sellOn ].join(',')} ${symbol}`);
@@ -71,6 +72,14 @@ Sell the same on ${sellOn}`);
     trades.sell.map(t => commandToExecuteTrade('sell', t)).forEach(t => console.log(t));
     console.log('');
   }
+}
+
+function parseCurrenciesFromSymbol(symbol) {
+  const slashPosition = symbol.indexOf('/');
+  if (slashPosition <= 0) throw `Invalid symbol: ${symbol}`;
+  const currencyA = symbol.substring(0, slashPosition);
+  const currencyB = symbol.substring(slashPosition + 1, symbol.length);
+  return [currencyA, currencyB];
 }
 
 process.on('unhandledRejection', r => console.log(r));

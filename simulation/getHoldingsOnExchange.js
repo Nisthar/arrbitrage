@@ -1,11 +1,7 @@
 const { fetchBalance } = require('./fetchExchangeData.js');
 
-async function getHoldingsOnExchange(exchangeIds, symbol) {
-  const slashPosition = symbol.indexOf('/');
-  if (slashPosition <= 0) throw `Invalid symbol: ${symbol}`;
-  const currencyA = symbol.substring(0, slashPosition);
-  const currencyB = symbol.substring(slashPosition + 1, symbol.length);
-
+async function getHoldingsOnExchange(exchangeIds, currencies) {
+  const [ currencyA, currencyB ] = currencies;
   const result = { currencyA, currencyB };
   for (let exchangeId of exchangeIds) {
     const balance = await fetchBalance(exchangeId) || {};
