@@ -1,6 +1,6 @@
 'use strict';
 
-function getProfitableOrders(orderBook) {
+function getProfitableOrders(orderBook, priceMarginPercent = 0) {
   const { asks, bids } = orderBook;
   const result = {
     asks: [],
@@ -9,7 +9,7 @@ function getProfitableOrders(orderBook) {
 
   let askIterator = 0, bidIterator = 0;
   let currentAsk = Object.assign({}, asks[askIterator]), currentBid = Object.assign({}, bids[bidIterator]);
-  while (currentAsk && currentBid && currentAsk.priceWithFee < currentBid.priceWithFee) {
+  while (currentAsk && currentBid && currentAsk.priceWithFee * (1 + priceMarginPercent / 100) < currentBid.priceWithFee) {
     const amount = Math.min(currentAsk.amount, currentBid.amount);
     if (amount === currentAsk.amount) {
       result.asks.push(currentAsk);

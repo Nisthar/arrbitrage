@@ -1,4 +1,4 @@
-function calcEarningsFromOrders(orderBook) {
+function calcEarningsFromOrders(orderBook, approximateValueOfCurrencyB) {
   const deltaReducer = (orderType) => (prev, curr) => {
     const { exchangeId } = curr;
     const existingDelta = prev[exchangeId] || {};
@@ -30,6 +30,7 @@ function calcEarningsFromOrders(orderBook) {
   const earnedValueB = delta.deltaA * meanOrderPrice + delta.deltaB;
   const margin = (earnedValueB / totalVolumeB * 100) || 0;
   const bestMargin = orderBook.bids[0] && orderBook.asks[0] && (orderBook.bids[0].priceWithFee - orderBook.asks[0].priceWithFee) / orderBook.asks[0].priceWithFee * 100 || 0;
+  const earnedUsd = approximateValueOfCurrencyB && earnedValueB * approximateValueOfCurrencyB || 0;
 
   return {
     deltaByExchange,
@@ -41,6 +42,7 @@ function calcEarningsFromOrders(orderBook) {
     margin,
     bestMargin,
     meanOrderPrice,
+    earnedUsd,
     summary: {
       totalVolumeA,
       meanOrderPrice,

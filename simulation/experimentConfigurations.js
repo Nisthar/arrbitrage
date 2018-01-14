@@ -12,6 +12,12 @@ const cryptoToCryptoExchanges = [
 // Removed 'cryptopia', 'quadrigacx',
 const exchangesWithAccounts = ['gateio', 'huobipro', 'liqui', 'bleutrade', 'binance'];
 
+const scannerPriceMarginAfterFees = 2.5;
+const scannerProfitThresholdUsd = 50;
+const realPriceMarginAfterFees = 0.5;
+const realProfitThresholdUsd = 0.25;
+
+
 // const heldCurrencies = ['NEO', 'BTC', 'ETH', 'BAT', 'AST', 'RCN', 'GNT', 'REP', 'GNO', 'STORJ', 'BNT', 'MTX', 'BTG', 'KIN', 'LTC', 'DOGE', 'XLM', 'USDT', 'XMR' ];
 const heldCurrencies = ['AST', 'BAT', 'BCD', 'BNT', 'BTC', 'BTG', 'ETH', 'GNT', 'REP', 'STORJ'];
 const isAcceptedCurrencies = (symbol) => heldCurrencies.some(c => symbol.startsWith(`${c}/`)) && heldCurrencies.some(c => symbol.endsWith(`/${c}`));
@@ -24,6 +30,8 @@ async function getExperimentConfiguration(name) {
       logSummaryTable: true,
       infiniteHoldings: true,
       logTradeDescriptions: true,
+      priceMarginAfterFees: scannerPriceMarginAfterFees,
+      profitThresholdUsd: scannerProfitThresholdUsd,
     }),
     scanc2c: async () => await genericExchangePairExperiment({
       exchangeIds: cryptoToCryptoExchanges,
@@ -31,6 +39,8 @@ async function getExperimentConfiguration(name) {
       logSummaryTable: true,
       infiniteHoldings: true,
       logTradeDescriptions: true,
+      priceMarginAfterFees: scannerPriceMarginAfterFees,
+      profitThresholdUsd: scannerProfitThresholdUsd,
     }),
     scanApprovedExchanges: async () => await genericExchangePairExperiment({
       exchangeIds: exchangesWithAccounts,
@@ -38,12 +48,15 @@ async function getExperimentConfiguration(name) {
       logSummaryTable: true,
       infiniteHoldings: true,
       logTradeDescriptions: true,
+      priceMarginAfterFees: scannerPriceMarginAfterFees,
+      profitThresholdUsd: scannerProfitThresholdUsd,
     }),
     deep: {
       exchangeIds: process.argv.length > 3 && process.argv[3].split(','),
       symbols: process.argv.length > 3 && process.argv[4].split(','),
       logDetailedTrades: true,
       logTradeDescriptions: true,
+      priceMarginAfterFees: process.argv[5] || realProfitThresholdUsd,
     },
     real: async () => await genericExchangePairExperiment({
       exchangeIds: exchangesWithAccounts,
@@ -51,6 +64,8 @@ async function getExperimentConfiguration(name) {
       logDetailedTrades: false,
       logTradeDescriptions: true,
       logSummaryTable: false,
+      priceMarginAfterFees: realPriceMarginAfterFees,
+      profitThresholdUsd: realProfitThresholdUsd,
     }),
   };
 

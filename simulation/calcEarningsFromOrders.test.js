@@ -15,6 +15,7 @@ describe('Calculate earnings from orders', () => {
         totalVolumeA: 0,
         totalVolumeB: 0,
         meanOrderPrice: 0,
+        earnedUsd: 0,
         earnedValueB: 0,
         margin: 0,
         bestMargin: 0,
@@ -26,7 +27,7 @@ describe('Calculate earnings from orders', () => {
         "asks": [{exchangeId:"huobipro", amount: 5, priceWithFee: 0.25 }],
         "bids": [{exchangeId:"liqui", amount: 4, priceWithFee: 0.75 }]
       };
-      const result = calcEarningsFromOrders(orderBook);
+      const result = calcEarningsFromOrders(orderBook, 9);
       expect(stripSummary(result)).to.deep.eq({
         deltaByExchange: {
           liqui: { deltaA: -4, deltaB: 3 },
@@ -36,6 +37,7 @@ describe('Calculate earnings from orders', () => {
         deltaB: 1.75,
         totalVolumeA: 9,
         totalVolumeB: 4.25,
+        earnedUsd: 20,
         meanOrderPrice: 4.25/9,
         earnedValueB: 1.75 + 4.25/9,
         margin: 52.28758169934641,
@@ -61,6 +63,7 @@ describe('Calculate earnings from orders', () => {
         totalVolumeA: 2673.41253224,
         totalVolumeB: 0.05308027833459,
         meanOrderPrice: 0.0000198548775,
+        earnedUsd: 0,
         earnedValueB: 0.00006763065353434378,
         margin: 0.1274120175256729,
         bestMargin: 0.2551491257001015,
@@ -86,6 +89,7 @@ describe('Calculate earnings from orders', () => {
         meanOrderPrice: 0.00015614767928161298,
         earnedValueB: 0.00004355902083532509,
         margin: 0.17192131299326924,
+        earnedUsd: 0,
         bestMargin: 0.4021982396680515,
       });
     });

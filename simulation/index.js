@@ -27,14 +27,17 @@ const asTable = require('as-table').configure({ delimiter: '|', print: obj => !N
     const fulfillableOrderBook = getFulfillableOrders(orderBooks, holdings);
 
     /* Pull out the profitable order pairs */
-    const profitableOrders = getProfitableOrders(fulfillableOrderBook);
+    const profitableOrders = getProfitableOrders(fulfillableOrderBook, experimentConfiguration.priceMarginAfterFees || 0);
 
     if (profitableOrders.asks && profitableOrders.asks.length > 0) {
       /* Calculate the profit that will be made and the percent margin on stake */
-      const earnings = calcEarningsFromOrders(profitableOrders);
+      const approximateValueOfCurrencyB = cryptoValuation[currencies[1]];
+      const earnings = calcEarningsFromOrders(profitableOrders, approximateValueOfCurrencyB);
       const trades = getTradesFromOrders(profitableOrders);
-
-      saveAndLogArrbitrage(symbol, earnings, holdings, currencies, trades, experimentConfiguration);
+      
+      if (earnings.earnedUsd >= experimentConfiguration.profitThresholdUsd) {
+        saveAndLogArrbitrage(symbol, earnings, holdings, currencies, trades, experimentConfiguration);
+      }
     }
   }
   
@@ -47,13 +50,7 @@ const summaries = [];
 function saveAndLogArrbitrage(symbol, earnings, holdings, currencies, trades, { logDetailedTrades, logTradeDescriptions }) {
   const buyOn = trades.buy.map(t => t.exchangeId);
   const sellOn = trades.sell.map(t => t.exchangeId);
-
-  const approximateValueOfCurrencyB = cryptoValuation[holdings.currencyB];
-  const summary = Object.assign({ symbol }, earnings.summary, {
-    buyOn,
-    sellOn,
-    earnedUsd: approximateValueOfCurrencyB && approximateValueOfCurrencyB * earnings.earnedValueB
-  });
+  const summary = Object.assign({ symbol }, earnings.summary, { buyOn, sellOn });
   summaries.push(summary);
 
   if (logDetailedTrades) {
@@ -61,7 +58,7 @@ function saveAndLogArrbitrage(symbol, earnings, holdings, currencies, trades, { 
   }
 
   if (logTradeDescriptions) {
-    console.log(`Earn ~$${summary.earnedUsd.toFixed(2)} USD at ${earnings.bestMargin.toFixed(1)}% - ${earnings.margin.toFixed(1)}% on ${symbol}
+    console.log(`Earn ~$${earnings.earnedUsd.toFixed(2)} USD at ${earnings.bestMargin.toFixed(1)}% - ${earnings.margin.toFixed(1)}% on ${symbol}
 Buy ${(earnings.totalVolumeA / 2).toPrecision(2)} ${currencies[0]} on ${buyOn}
 Sell the same on ${sellOn}`);
 

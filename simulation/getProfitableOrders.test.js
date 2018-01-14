@@ -50,6 +50,12 @@ describe('Get profitable orders', () => {
       expect(result.bids).to.deep.eq([ genOrder(2, 1) ]);
     });
 
+    it('Basic per order profit margin after fees', () => {
+      const orderBook = { asks: [ genOrder(1, 1) ], bids: [ genOrder(1.1, 1) ] };
+      const result = getProfitableOrders(orderBook, 50);
+      expect(result).to.deep.eq(emptyOrder);
+    });
+
     it('Multiple profitable and unprofitable orders', () => {
       const profitableAsks = [ genOrder(9, 3), genOrder(12, 2) ];
       const nonprofitableAsks = [ genOrder(15, 7) ];
