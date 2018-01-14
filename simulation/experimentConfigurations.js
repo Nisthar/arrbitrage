@@ -15,7 +15,7 @@ const exchangesWithAccounts = ['gateio', 'huobipro', 'liqui', 'binance' ];
 const scannerPriceMarginAfterFees = 2.5;
 const scannerProfitThresholdUsd = 50;
 const realPriceMarginAfterFees = 0.5;
-const realProfitThresholdUsd = 0.25;
+const realProfitThresholdUsd = 0.05;
 
 
 // const heldCurrencies = ['NEO', 'BTC', 'ETH', 'BAT', 'AST', 'RCN', 'GNT', 'REP', 'GNO', 'STORJ', 'BNT', 'MTX', 'BTG', 'KIN', 'LTC', 'DOGE', 'XLM', 'USDT', 'XMR' ];
