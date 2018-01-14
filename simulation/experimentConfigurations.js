@@ -56,7 +56,6 @@ async function getExperimentConfiguration(name) {
       symbols: process.argv.length > 3 && process.argv[4].split(','),
       logDetailedTrades: true,
       logTradeDescriptions: true,
-      priceMarginAfterFees: process.argv[5] || realProfitThresholdUsd,
     },
     real: async () => await genericExchangePairExperiment({
       exchangeIds: exchangesWithAccounts,
