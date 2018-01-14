@@ -40,7 +40,7 @@ const asTable = require('as-table').configure({ delimiter: '|', print: obj => !N
 
         if (experimentConfiguration.autoExecuteTrades) {
           const executedTrades = await executeTrades(trades, symbol);
-          console.log(JSON.stringify(executedTrades));
+          console.log(JSON.stringify(executedTrades, null, 2));
           console.log('');
           process.exit(1);
         }

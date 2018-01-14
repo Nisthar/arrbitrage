@@ -1,26 +1,26 @@
 const { exchangesWithAccounts } = require('./simulation/experimentConfigurations');
-const { fetchBalance } = require('./simulation/fetchExchangeData');
+const { fetchBalances } = require('./simulation/fetchExchangeData');
 
-const asTable = require('as-table').configure({ delimiter: '|' });
+const asTable = require('as-table').configure({ delimiter: ';' });
 
 (async function main() {
   const rows = [];
-  const currencies = new Set();
-  for (const id of exchangesWithAccounts) {
-    const balance = await fetchBalance(id);
-    if (balance) {
-      Object.keys(balance).filter(c => balance[c] !== 0).forEach(currency => currencies.add(currency));
-    }
-  }
+  const exchangeHoldings = await fetchBalances(exchangesWithAccounts);
+  const currencies = Array.from(exchangesWithAccounts.reduce((current, exchangeId) => {
+    const balance = exchangeHoldings[exchangeId];
+    Object.keys(balance).filter(c => balance[c] !== 0).forEach(currency => current.add(currency));
+    return current;
+  }, new Set())).sort();
 
   for (const exchangeId of exchangesWithAccounts.sort()) {
-    const row = { exchangeId };
-    const balance = await fetchBalance(exchangeId);
-    currencies.forEach(c => row[c] = balance[c]);
+    const row = currencies.reduce((current, currency) => {
+      current[currency] = exchangeHoldings[exchangeId][currency];
+      return current;
+    }, { exchangeId });
     rows.push(row);
   }
 
-  const header = [ 'exchangeId', ...Array.from(currencies).sort() ];
+  const header = [ 'exchangeId', ...currencies ];
   const sortedRows = rows.map(r => header.map(h => r[h]));
   console.log(asTable([ header, ...sortedRows ]));
 })();

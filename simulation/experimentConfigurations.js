@@ -22,7 +22,7 @@ const realProfitThresholdUsd = 0.05;
 const heldCurrencies = ['AST', 'BAT', 'BCD', 'BNT', 'BTC', 'BTG', 'ETH', 'GNT', 'REP', 'STORJ'];
 const isAcceptedCurrencies = (symbol) => heldCurrencies.some(c => symbol.startsWith(`${c}/`)) && heldCurrencies.some(c => symbol.endsWith(`/${c}`));
 const isFiatMarket = (symbol) => ['USD', 'CAD', 'EUR', 'NZD', 'SGD', 'RUB', 'RUR', 'AUD', 'GBP', 'HKD', 'JPY' ].some(c => symbol.endsWith(`/${c}`));
-const isSettlementCurrencyMarket = (symbol) => parseCurrenciesFromSymbol(symbol).every(cur => ['ETH', 'BTC'].includes(cur));
+const isSettlementCurrencyMarket = (symbol) => parseCurrenciesFromSymbol(symbol).every(cur => ['ETH', 'BTC', 'USDT'].includes(cur));
 
 /* TODO This is duplicated code */
 function parseCurrenciesFromSymbol(symbol) {
