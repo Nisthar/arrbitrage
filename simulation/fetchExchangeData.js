@@ -22,15 +22,21 @@ async function fetchExchange(exchangeId) {
 }
 
 async function fetchOrderBooks(exchangeIds, symbol) {
-  const exchanges = {};
-  for (let id of exchangeIds) {
-    const exchange = await fetchOrderBook(id, symbol);
-    if (exchange) {
-      exchanges[id] = exchange;
-    } 
-  }
+  const promiseToFetchBooks = exchangeIds.map(id => fetchOrderBook(id, symbol));
+  return (await Promise.all(promiseToFetchBooks)).reduce((cur, orderBook, index) => {
+    const exchangeId = exchangeIds[index];
+    cur[exchangeId] = orderBook;
+    return cur;
+  }, {});
+}
 
-  return exchanges;
+async function fetchBalances(exchangeIds) {
+  const promiseToFetchBalances = exchangeIds.map(id => fetchBalance(id));
+  return (await Promise.all(promiseToFetchBalances)).reduce((cur, balance, index) => {
+    const exchangeId = exchangeIds[index];
+    cur[exchangeId] = balance;
+    return cur;
+  }, {});
 }
 
 async function fetchBalance(exchangeId) {
@@ -139,5 +145,6 @@ module.exports = {
   executeTrades,
   fetchExchange,
   fetchBalance,
+  fetchBalances,
   fetchOrderBooks,
 };
