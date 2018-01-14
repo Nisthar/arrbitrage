@@ -35,7 +35,7 @@ const asTable = require('as-table').configure({ delimiter: '|', print: obj => !N
       const earnings = calcEarningsFromOrders(profitableOrders, approximateValueOfCurrencyB);
       const trades = getTradesFromOrders(profitableOrders);
       
-      if (earnings.earnedUsd >= experimentConfiguration.profitThresholdUsd) {
+      if (!earnings.earnedUsd || !experimentConfiguration.profitThresholdUsd || earnings.earnedUsd >= experimentConfiguration.profitThresholdUsd) {
         saveAndLogArrbitrage(symbol, earnings, holdings, currencies, trades, experimentConfiguration);
       }
     }
