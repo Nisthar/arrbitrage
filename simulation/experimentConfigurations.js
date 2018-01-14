@@ -32,9 +32,9 @@ async function getExperimentConfiguration(name) {
       infiniteHoldings: true,
       logTradeDescriptions: true,
     }),
-    infinite: async () => await genericExchangePairExperiment({
+    scanApprovedExchanges: async () => await genericExchangePairExperiment({
       exchangeIds: exchangesWithAccounts,
-      symbolFilter: sym => !isFiatMarket(sym) && isAcceptedCurrencies(sym),
+      symbolFilter: sym => !isFiatMarket(sym),
       logSummaryTable: true,
       infiniteHoldings: true,
       logTradeDescriptions: true,
