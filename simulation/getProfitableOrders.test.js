@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const getProfitableOrders = require('./getProfitableOrders.js');
+const getProfitableOrders = require('./getProfitableOrders');
 const genOrder = (price, amount) => ({amount, priceWithFee: price});
 const emptyOrder = { asks: [], bids: [] };
 

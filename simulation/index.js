@@ -1,11 +1,11 @@
-const { getExperimentConfiguration } = require('./experimentConfigurations.js');
+const { getExperimentConfiguration } = require('./experimentConfigurations');
 const { fetchOrderBooks } = require('./fetchExchangeData.js');
-const getHoldingsOnExchange = require('./getHoldingsOnExchange.js');
-const getFulfillableOrders = require('./getFulfillableOrders.js');
-const getProfitableOrders = require('./getProfitableOrders.js');
-const calcEarningsFromOrders = require('./calcEarningsFromOrders.js');
-const cryptoValuation = require('./cryptoValuation.js');
-const getTradesFromOrders = require('./getTradesFromOrders.js');
+const getHoldingsOnExchange = require('./getHoldingsOnExchange');
+const getFulfillableOrders = require('./getFulfillableOrders');
+const getProfitableOrders = require('./getProfitableOrders');
+const calcEarningsFromOrders = require('./calcEarningsFromOrders');
+const cryptoValuation = require('./cryptoValuation');
+const getTradesFromOrders = require('./getTradesFromOrders');
 
 const asTable = require('as-table').configure({ delimiter: '|', print: obj => !Number.isNaN(obj) && obj.toPrecision ? obj.toPrecision(2) : String (obj) });
 
@@ -60,9 +60,16 @@ function saveAndLogArrbitrage(symbol, earnings, holdings, trades, { logDetailedT
   }
 
   if (logTradeDescriptions) {
-    console.log(`Earn ~$${summary.earnedUsd.toFixed(2)} USD at ${earnings.margin}%-${earnings.bestMargin} on ${symbol}
+    console.log(`Earn ~$${summary.earnedUsd.toFixed(2)} USD at ${earnings.bestMargin.toFixed(1)}% - ${earnings.margin.toFixed(1)}% on ${symbol}
 Buy ${(earnings.totalVolumeA / 2).toPrecision(2)} ${holdings.currencyA} on ${buyOn}
 Sell the same on ${sellOn}`);
+
+    console.log(`Details: node simulation deep ${[ ...buyOn, ...sellOn ].join(',')} ${symbol}`);
+    console.log('Execute:');
+    const commandToExecuteTrade = (orderType, trade) => `node execute ${trade.exchangeId} ${orderType} ${trade.amount} ${symbol} ${trade.price}`;
+    trades.buy.map(t => commandToExecuteTrade('buy', t)).forEach(t => console.log(t));
+    trades.sell.map(t => commandToExecuteTrade('sell', t)).forEach(t => console.log(t));
+    console.log('');
   }
 }
 

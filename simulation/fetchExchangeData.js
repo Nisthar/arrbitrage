@@ -5,7 +5,7 @@ Uses ccxt to load market information for a given exchange.
 */
 
 const ccxt = require ('ccxt');
-const credentials = require('./../credentials.js');
+const credentials = require('./../credentials');
 
 const exchangeCache = {};
 const balanceCache = {};
@@ -72,6 +72,25 @@ async function fetchOrderBook(exchangeId, symbol) {
   };
 }
 
+async function executeTrade(exchangeId, orderType, amount, symbol, price) {
+  if (!['buy', 'sell'].some(o => orderType === o)) throw '[Execute Trade] Invalid order type';
+  if (Number.isNaN(amount) || amount < 0) throw '[Execute Trade] Invalid amount';
+  if (symbol.length < 6 || symbol.length > 9 || !symbol.includes('/')) throw '[Execute Trade] Invalid symbol';
+  if (Number.isNaN(price)) throw '[Execute Trade] Invalid price';
+
+  const exchange = await fetchExchange(exchangeId);
+
+  if (orderType === 'buy') {
+    return await execute(() => exchange.createLimitBuyOrder(symbol, amount, price));
+  }
+
+  if (orderType === 'sell') {
+    return await execute(() => exchange.createLimitSellOrder(symbol, amount, price));
+  }
+
+  throw 'wtf';
+}
+
 async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -103,6 +122,7 @@ async function execute(func, maxRetries = 10, sleepBeforeRequests = 1000) {
 }
 
 module.exports = {
+  executeTrade,
   fetchExchange,
   fetchBalance,
   fetchOrderBooks,

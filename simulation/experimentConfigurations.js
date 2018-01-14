@@ -1,4 +1,4 @@
-const genericExchangePairExperiment = require('./genericExchangePairExperiment.js');
+const genericExchangePairExperiment = require('./genericExchangePairExperiment');
 
 const considerableHoldings = {};
 

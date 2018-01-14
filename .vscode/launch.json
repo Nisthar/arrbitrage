@@ -7,9 +7,17 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
+      "name": "Execute",
+      "program": "${workspaceRoot}/execute.js",
+      "args": ["gateio", "sell", "1", "DOGE/USDT", "1.03"],
+      "cwd": "${workspaceRoot}"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Real",
       "program": "${workspaceRoot}/simulation/index.js",
-      "args": ["liqobi"],
+      "args": ["real"],
       "cwd": "${workspaceRoot}"
     },
     {

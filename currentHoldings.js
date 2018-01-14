@@ -1,5 +1,5 @@
-const { exchangesWithAccounts } = require('./simulation/experimentConfigurations.js');
-const { fetchBalance } = require('./simulation/fetchExchangeData.js');
+const { exchangesWithAccounts } = require('./simulation/experimentConfigurations');
+const { fetchBalance } = require('./simulation/fetchExchangeData');
 
 const asTable = require('as-table').configure({ delimiter: '|' });
 

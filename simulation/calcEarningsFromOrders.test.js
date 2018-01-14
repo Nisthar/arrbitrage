@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const calcEarningsFromOrders = require('./calcEarningsFromOrders.js');
+const calcEarningsFromOrders = require('./calcEarningsFromOrders');
 
 const stripSummary = (obj) => { delete obj['summary']; return obj; };
 

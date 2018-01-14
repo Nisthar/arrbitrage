@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { isFiatMarket } = require('./experimentConfigurations.js');
+const { isFiatMarket } = require('./experimentConfigurations');
 
 describe('Experiment configuration', () => {
   it('isFiatMarket', () => {

@@ -2,19 +2,25 @@ function getTradesFromOrders(orderBook) {
   const trades = [];
   
   return {
-    buy: determineTrades(orderBook.asks),
-    sell: determineTrades(orderBook.bids),
+    buy: buildTradesFromOrderBook('buy', orderBook.asks),
+    sell: buildTradesFromOrderBook('sell', orderBook.bids),
   };
 }
 
-function determineTrades(orders) {
+function buildTradesFromOrderBook(orderType, orders) {
   const map = orders.reduce((result, order) => {
     if (!result[order.exchangeId]) {
-      result[order.exchangeId] = { price: 0, amount: 0 };
+      const initialPrice = orderType === 'buy' ? 0 : Number.MAX_VALUE;
+      result[order.exchangeId] = { price: initialPrice, amount: 0 };
     }
 
     const trade = result[order.exchangeId];
-    trade.price = Math.max(trade.price, order.price);
+    /*
+    Buy at the highest profitable price
+    Sell at the lowest profitable price
+    */
+
+    trade.price = orderType === 'buy' ? Math.max(trade.price, order.price) : Math.min(trade.price, order.price);
     trade.amount += order.amount;
     return result;
   }, {});

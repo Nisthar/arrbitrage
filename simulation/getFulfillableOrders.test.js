@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const getFulfillableOrders = require('./getFulfillableOrders.js');
+const getFulfillableOrders = require('./getFulfillableOrders');
 const genOrder = (price, amount) => ({amount, priceWithFee: price});
 
 const mockExchangeOne = {

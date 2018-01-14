@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const getTradesFromOrders = require('./getTradesFromOrders.js');
+const getTradesFromOrders = require('./getTradesFromOrders');
 const genOrder = (exchangeId, price, amount) => ({ exchangeId, amount, price });
 
 describe('Get trades from orders', () => {
