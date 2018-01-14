@@ -1,5 +1,5 @@
 const { getExperimentConfiguration } = require('./experimentConfigurations');
-const { fetchOrderBooks } = require('./fetchExchangeData.js');
+const { fetchOrderBooks, executeTrades } = require('./fetchExchangeData.js');
 const getHoldingsOnExchange = require('./getHoldingsOnExchange');
 const getFulfillableOrders = require('./getFulfillableOrders');
 const getProfitableOrders = require('./getProfitableOrders');
@@ -31,12 +31,19 @@ const asTable = require('as-table').configure({ delimiter: '|', print: obj => !N
 
     if (profitableOrders.asks && profitableOrders.asks.length > 0) {
       /* Calculate the profit that will be made and the percent margin on stake */
-      const approximateValueOfCurrencyB = cryptoValuation[currencies[1]];
-      const earnings = calcEarningsFromOrders(profitableOrders, approximateValueOfCurrencyB);
+      const usdValueForCurrencyB = cryptoValuation[currencies[1]];
+      const earnings = calcEarningsFromOrders(profitableOrders, usdValueForCurrencyB);
       const trades = getTradesFromOrders(profitableOrders);
       
-      if (!earnings.earnedUsd || !experimentConfiguration.profitThresholdUsd || earnings.earnedUsd >= experimentConfiguration.profitThresholdUsd) {
+      if (!experimentConfiguration.profitThresholdUsd || earnings.earnedUsd >= experimentConfiguration.profitThresholdUsd) {
         saveAndLogArrbitrage(symbol, earnings, holdings, currencies, trades, experimentConfiguration);
+
+        if (experimentConfiguration.autoExecuteTrades) {
+          const executedTrades = await executeTrades(trades, symbol);
+          console.log(JSON.stringify(executedTrades));
+          console.log('');
+          process.exit(1);
+        }
       }
     }
   }

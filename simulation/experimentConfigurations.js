@@ -9,8 +9,8 @@ const cryptoToCryptoExchanges = [
   'southxchange', 'therock', 'tidex', 'wex', 'zaif'
 ];
 
-// Removed 'cryptopia', 'quadrigacx',
-const exchangesWithAccounts = ['gateio', 'huobipro', 'liqui', 'bleutrade', 'binance'];
+// Removed 'cryptopia', 'quadrigacx', 'bleutrade',
+const exchangesWithAccounts = ['gateio', 'huobipro', 'liqui', 'binance' ];
 
 const scannerPriceMarginAfterFees = 2.5;
 const scannerProfitThresholdUsd = 50;
@@ -22,6 +22,16 @@ const realProfitThresholdUsd = 0.25;
 const heldCurrencies = ['AST', 'BAT', 'BCD', 'BNT', 'BTC', 'BTG', 'ETH', 'GNT', 'REP', 'STORJ'];
 const isAcceptedCurrencies = (symbol) => heldCurrencies.some(c => symbol.startsWith(`${c}/`)) && heldCurrencies.some(c => symbol.endsWith(`/${c}`));
 const isFiatMarket = (symbol) => ['USD', 'CAD', 'EUR', 'NZD', 'SGD', 'RUB', 'RUR', 'AUD', 'GBP', 'HKD', 'JPY' ].some(c => symbol.endsWith(`/${c}`));
+const isSettlementCurrencyMarket = (symbol) => parseCurrenciesFromSymbol(symbol).every(cur => ['ETH', 'BTC'].includes(cur));
+
+/* TODO This is duplicated code */
+function parseCurrenciesFromSymbol(symbol) {
+  const slashPosition = symbol.indexOf('/');
+  if (slashPosition <= 0) throw `Invalid symbol: ${symbol}`;
+  const currencyA = symbol.substring(0, slashPosition);
+  const currencyB = symbol.substring(slashPosition + 1, symbol.length);
+  return [currencyA, currencyB];
+}
 
 async function getExperimentConfiguration(name) {
   const configurations = {
@@ -59,12 +69,13 @@ async function getExperimentConfiguration(name) {
     },
     real: async () => await genericExchangePairExperiment({
       exchangeIds: exchangesWithAccounts,
-      symbolFilter: sym => !isFiatMarket(sym) && isAcceptedCurrencies(sym),
+      symbolFilter: sym => !isFiatMarket(sym) && isAcceptedCurrencies(sym) && !isSettlementCurrencyMarket(sym),
       logDetailedTrades: false,
       logTradeDescriptions: true,
       logSummaryTable: false,
       priceMarginAfterFees: realPriceMarginAfterFees,
       profitThresholdUsd: realProfitThresholdUsd,
+      autoExecuteTrades: true,
     }),
   };
 

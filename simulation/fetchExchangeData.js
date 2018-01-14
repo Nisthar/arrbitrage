@@ -72,6 +72,19 @@ async function fetchOrderBook(exchangeId, symbol) {
   };
 }
 
+async function executeTrades(trades, symbol) {
+  const ids = [];
+  const doExecute = async (trade, orderType) => {
+    const { exchangeId, amount, price } = trade;
+    return executeTrade(exchangeId, orderType, amount, symbol, price);
+  };
+
+  return Promise.all([
+    ...trades.buy.map(t => doExecute(t, 'buy'), ),
+    ...trades.sell.map(t => doExecute(t, 'sell'), ),
+  ]);
+}
+
 async function executeTrade(exchangeId, orderType, amount, symbol, price) {
   if (!['buy', 'sell'].some(o => orderType === o)) throw '[Execute Trade] Invalid order type';
   if (Number.isNaN(amount) || amount < 0) throw '[Execute Trade] Invalid amount';
@@ -123,6 +136,7 @@ async function execute(func, maxRetries = 10, sleepBeforeRequests = 1000) {
 
 module.exports = {
   executeTrade,
+  executeTrades,
   fetchExchange,
   fetchBalance,
   fetchOrderBooks,
