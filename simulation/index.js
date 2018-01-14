@@ -60,7 +60,9 @@ function saveAndLogArrbitrage(symbol, earnings, holdings, trades, { logDetailedT
   }
 
   if (logTradeDescriptions) {
-    console.log(`Buy/Sell ${(earnings.totalVolumeA / 2).toPrecision(2)} ${holdings.currencyA} on ${buyOn}/${sellOn} to realize gain of ${earnings.earnedValueB.toPrecision(2)}${holdings.currencyB} (~$${summary.earnedUsd.toFixed(2)} USD)`);
+    console.log(`Earn ~$${summary.earnedUsd.toFixed(2)} USD at ${earnings.margin}%-${earnings.bestMargin} on ${symbol}
+Buy ${(earnings.totalVolumeA / 2).toPrecision(2)} ${holdings.currencyA} on ${buyOn}
+Sell the same on ${sellOn}`);
   }
 }
 
