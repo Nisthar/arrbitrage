@@ -129,8 +129,9 @@ async function execute(func, maxRetries = 10, sleepBeforeRequests = 1000) {
         console.warn('[Authentication Error] ' + e.message)
       } else if (e instanceof ccxt.ExchangeNotAvailable) {
         console.warn('[Exchange Not Available Error] ' + e.message)
-      // } else if (e instanceof ccxt.ExchangeError) {
-      //   console.warn('[Exchange Error] ' + e.message)
+      } else if (e instanceof ccxt.ExchangeError) {
+        console.warn('[Exchange Error] ' + e.message);
+        return undefined;
       } else {
         throw e;
       }
