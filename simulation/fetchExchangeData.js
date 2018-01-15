@@ -21,24 +21,6 @@ async function fetchExchange(exchangeId) {
   return exchangeCache[exchangeId];
 }
 
-async function fetchOrderBooks(exchangeIds, symbol) {
-  const promiseToFetchBooks = exchangeIds.map(id => fetchOrderBook(id, symbol));
-  return (await Promise.all(promiseToFetchBooks)).reduce((cur, orderBook, index) => {
-    const exchangeId = exchangeIds[index];
-    cur[exchangeId] = orderBook;
-    return cur;
-  }, {});
-}
-
-async function fetchBalances(exchangeIds) {
-  const promiseToFetchBalances = exchangeIds.map(id => fetchBalance(id));
-  return (await Promise.all(promiseToFetchBalances)).reduce((cur, balance, index) => {
-    const exchangeId = exchangeIds[index];
-    cur[exchangeId] = balance;
-    return cur;
-  }, {});
-}
-
 async function fetchBalance(exchangeId) {
   if (!balanceCache[exchangeId]) {
     const exchange = await fetchExchange(exchangeId);
@@ -78,20 +60,9 @@ async function fetchOrderBook(exchangeId, symbol) {
   };
 }
 
-async function executeTrades(trades, symbol) {
-  const ids = [];
-  const doExecute = async (trade, orderType) => {
-    const { exchangeId, amount, price } = trade;
-    return executeTrade(exchangeId, orderType, amount, symbol, price);
-  };
-
-  return Promise.all([
-    ...trades.buy.map(t => doExecute(t, 'buy'), ),
-    ...trades.sell.map(t => doExecute(t, 'sell'), ),
-  ]);
-}
-
 async function executeTrade(exchangeId, orderType, amount, symbol, price) {
+  console.log(`Executing trade ${JSON.stringify(arguments)}`);
+
   if (!['buy', 'sell'].some(o => orderType === o)) throw '[Execute Trade] Invalid order type';
   if (Number.isNaN(amount) || amount < 0) throw '[Execute Trade] Invalid amount';
   if (symbol.length < 6 || symbol.length > 9 || !symbol.includes('/')) throw '[Execute Trade] Invalid symbol';
@@ -108,6 +79,48 @@ async function executeTrade(exchangeId, orderType, amount, symbol, price) {
   }
 
   throw 'wtf';
+}
+
+async function fetchExchanges(exchangeIds) {
+  const promiseToFetchExchange = exchangeIds.map(id => fetchExchange(id));
+  return (await Promise.all(promiseToFetchExchange)).reduce((cur, exchange, index) => {
+    const exchangeId = exchangeIds[index];
+    cur[exchangeId] = exchange;
+    return cur;
+  }, {});
+}
+
+async function fetchOrderBooks(exchangeIds, symbol) {
+  console.log(`Fetching order books for ${symbol} on ${exchangeIds}`);
+  const promiseToFetchBooks = exchangeIds.map(id => fetchOrderBook(id, symbol));
+  return (await Promise.all(promiseToFetchBooks)).reduce((cur, orderBook, index) => {
+    const exchangeId = exchangeIds[index];
+    cur[exchangeId] = orderBook;
+    return cur;
+  }, {});
+}
+
+async function fetchBalances(exchangeIds) {
+  console.log(`Fetching balance on ${exchangeIds}`);
+  const promiseToFetchBalances = exchangeIds.map(id => fetchBalance(id));
+  return (await Promise.all(promiseToFetchBalances)).reduce((cur, balance, index) => {
+    const exchangeId = exchangeIds[index];
+    cur[exchangeId] = balance;
+    return cur;
+  }, {});
+}
+
+async function executeTrades(trades, symbol) {
+  const ids = [];
+  const doExecute = async (trade, orderType) => {
+    const { exchangeId, amount, price } = trade;
+    return executeTrade(exchangeId, orderType, amount, symbol, price);
+  };
+
+  return Promise.all([
+    ...trades.buy.map(t => doExecute(t, 'buy'), ),
+    ...trades.sell.map(t => doExecute(t, 'sell'), ),
+  ]);
 }
 
 async function sleep(ms) {
@@ -145,7 +158,9 @@ module.exports = {
   executeTrade,
   executeTrades,
   fetchExchange,
+  fetchExchanges,
   fetchBalance,
   fetchBalances,
+  fetchOrderBook,
   fetchOrderBooks,
 };

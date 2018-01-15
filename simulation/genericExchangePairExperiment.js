@@ -2,17 +2,14 @@
 
 const ccxt = require ('ccxt');
 
-const { fetchExchange, fetchBalances } = require('./fetchExchangeData');
+const { fetchExchanges, fetchBalances } = require('./fetchExchangeData');
 
 async function genericExchangePairExperiment(settings) {
   const { exchangeIds, symbolFilter } = settings;
-  const exchanges = {};
-  for (let id of exchangeIds) {
-    exchanges[id] = await fetchExchange(id);
-  }
+  const exchanges = await fetchExchanges(exchangeIds);
   
   // get all unique symbols
-  const uniqueSymbols = ccxt.unique (ccxt.flatten (exchangeIds.map (id => exchanges[id].symbols))).filter(s => !symbolFilter || symbolFilter(s));
+  const uniqueSymbols = ccxt.unique (ccxt.flatten (exchangeIds.map (id => exchanges[id].symbols))).filter(s => !s.endsWith('.d') && (!symbolFilter || symbolFilter(s)));
 
   // filter out symbols that are not present on at least two exchanges
   let arbitrableSymbols = uniqueSymbols
