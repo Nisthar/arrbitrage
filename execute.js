@@ -7,7 +7,7 @@ const [exchangeId, orderType, amount, symbol, price] = process.argv.splice(2);
 
 (async function main() {
   const executed = await executeTrade(exchangeId, orderType, amount, symbol, price);
-  console.log(JSON.stringify(executed));
+  console.log(executed.id);
 
   // const { id }= executed;
   // const { result, message } = executed.info;

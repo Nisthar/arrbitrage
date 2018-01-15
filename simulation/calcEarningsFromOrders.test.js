@@ -24,8 +24,8 @@ describe('Calculate earnings from orders', () => {
 
     it('Basic single trade order book', () => {
       const orderBook = {
-        "asks": [{exchangeId:"huobipro", amount: 5, priceWithFee: 0.25 }],
-        "bids": [{exchangeId:"liqui", amount: 4, priceWithFee: 0.75 }]
+        "asks": [{ exchangeId: "huobipro", amount: 5, priceWithFee: 0.25 }],
+        "bids": [{ exchangeId: "liqui", amount: 4, priceWithFee: 0.75 }]
       };
       const result = calcEarningsFromOrders(orderBook, 9);
       expect(stripSummary(result)).to.deep.eq({
@@ -38,8 +38,8 @@ describe('Calculate earnings from orders', () => {
         totalVolumeA: 9,
         totalVolumeB: 4.25,
         earnedUsd: 20,
-        meanOrderPrice: 4.25/9,
-        earnedValueB: 1.75 + 4.25/9,
+        meanOrderPrice: 4.25 / 9,
+        earnedValueB: 1.75 + 4.25 / 9,
         margin: 52.28758169934641,
         bestMargin: 200,
       });
@@ -49,8 +49,8 @@ describe('Calculate earnings from orders', () => {
   describe('Mock Data', () => {
     it('Mock data for arbitrage of TNT/BTC on Liqui/HuobiPro', () => {
       const orderBook = {
-        "asks":[{exchangeId:"huobipro","price":0.00001979,amount:1336.70626612,priceWithFee:0.00001982958}],
-        "bids":[{exchangeId:"liqui","price":0.00001993,amount:1336.70626612,priceWithFee:0.000019880175}]
+        "asks": [{ exchangeId: "huobipro", "price": 0.00001979, amount: 1336.70626612, priceWithFee: 0.00001982958 }],
+        "bids": [{ exchangeId: "liqui", "price": 0.00001993, amount: 1336.70626612, priceWithFee: 0.000019880175 }]
       };
       const result = calcEarningsFromOrders(orderBook);
       expect(stripSummary(result)).to.deep.eq({
@@ -72,8 +72,8 @@ describe('Calculate earnings from orders', () => {
 
     it('Mock data for arbitrage of STORJ/BTC on Liqui/HuobiPro', () => {
       const orderBook = {
-        "asks":[{exchangeId:"huobipro","price":0.00015553,amount:1.57799655,priceWithFee:0.00015584106},{exchangeId:"huobipro","price":0.00015553,amount:2.29200345,priceWithFee:0.00015584106},{exchangeId:"huobipro","price":0.00015557,amount:16.59455122,priceWithFee:0.00015588114},{exchangeId:"huobipro","price":0.00015557,amount:60.66570728,priceWithFee:0.00015588114}],
-        "bids":[{exchangeId:"liqui","price":0.00015686,amount:1.57799655,priceWithFee:0.00015646785000000002},{exchangeId:"liqui","price":0.00015683,amount:2.29200345,priceWithFee:0.000156437925},{exchangeId:"liqui","price":0.00015683,amount:16.59455122,priceWithFee:0.000156437925},{exchangeId:"liqui","price":0.0001568,amount:60.66570728,priceWithFee:0.000156408}]
+        "asks": [{ exchangeId: "huobipro", "price": 0.00015553, amount: 1.57799655, priceWithFee: 0.00015584106 }, { exchangeId: "huobipro", "price": 0.00015553, amount: 2.29200345, priceWithFee: 0.00015584106 }, { exchangeId: "huobipro", "price": 0.00015557, amount: 16.59455122, priceWithFee: 0.00015588114 }, { exchangeId: "huobipro", "price": 0.00015557, amount: 60.66570728, priceWithFee: 0.00015588114 }],
+        "bids": [{ exchangeId: "liqui", "price": 0.00015686, amount: 1.57799655, priceWithFee: 0.00015646785000000002 }, { exchangeId: "liqui", "price": 0.00015683, amount: 2.29200345, priceWithFee: 0.000156437925 }, { exchangeId: "liqui", "price": 0.00015683, amount: 16.59455122, priceWithFee: 0.000156437925 }, { exchangeId: "liqui", "price": 0.0001568, amount: 60.66570728, priceWithFee: 0.000156408 }]
       };
       const result = calcEarningsFromOrders(orderBook);
       expect(stripSummary(result)).to.deep.eq({

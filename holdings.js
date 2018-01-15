@@ -20,9 +20,9 @@ const asTable = require('as-table').configure({ delimiter: ';' });
     rows.push(row);
   }
 
-  const header = [ 'exchangeId', ...currencies ];
+  const header = ['exchangeId', ...currencies];
   const sortedRows = rows.map(r => header.map(h => r[h]));
-  console.log(asTable([ header, ...sortedRows ]));
+  console.log(asTable([header, ...sortedRows]));
 })();
 
 process.on('unhandledRejection', r => console.log(r));

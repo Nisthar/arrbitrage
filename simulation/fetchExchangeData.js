@@ -4,7 +4,7 @@
 Uses ccxt to load market information for a given exchange.
 */
 
-const ccxt = require ('ccxt');
+const ccxt = require('ccxt');
 const credentials = require('./../credentials');
 
 const exchangeCache = {};
@@ -50,7 +50,7 @@ async function fetchBalance(exchangeId) {
       balanceCache[exchangeId] = {};
     }
   }
-  
+
   return balanceCache[exchangeId];
 }
 
@@ -59,7 +59,7 @@ async function fetchOrderBook(exchangeId, symbol) {
   if (!exchange.markets[symbol]) {
     return {};
   }
-  
+
   const orderBook = await execute(() => exchange.fetchL2OrderBook(symbol));
   if (!orderBook) return undefined;
 
@@ -121,7 +121,7 @@ async function execute(func, maxRetries = 10, sleepBeforeRequests = 1000) {
       return await func();
     } catch (e) {
       // swallow connectivity exceptions only
-      if (e instanceof ccxt.DDoSProtection || e.message.includes ('ECONNRESET')) {
+      if (e instanceof ccxt.DDoSProtection || e.message.includes('ECONNRESET')) {
         console.warn('[DDoS Protection Error] ' + e.message)
       } else if (e instanceof ccxt.RequestTimeout) {
         console.warn('[Timeout Error] ' + e.message)

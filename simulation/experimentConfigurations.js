@@ -4,20 +4,20 @@ const considerableHoldings = {};
 
 /* Removed 'ccex', 'zb' */
 const cryptoToCryptoExchanges = [
-  'allcoin', 'binance', 'bitbay', 'bitcoincoid', 'bitfinex2', 'bitflyer', 'bitlish', 'bitso', 'bitstamp', 'bitstamp', 'bittrex', 'bleutrade', 'btcexchange', 'btcmarkets', 'btcturk', 'bxinth', 'cex', 
-  'cryptopia', 'dsx', 'exmo', 'gatecoin', 'gateio', 'gdax', 'gemini', 'hitbtc2', 'huobipro', 'kucoin', 'lakebtc', 'liqui', 'livecoin', 'mixcoins', 'poloniex', 'qryptos', 'quadrigacx', 'quoine', 
+  'allcoin', 'binance', 'bitbay', 'bitcoincoid', 'bitfinex2', 'bitflyer', 'bitlish', 'bitso', 'bitstamp', 'bitstamp', 'bittrex', 'bleutrade', 'btcexchange', 'btcmarkets', 'btcturk', 'bxinth', 'cex',
+  'cryptopia', 'dsx', 'exmo', 'gatecoin', 'gateio', 'gdax', 'gemini', 'hitbtc2', 'huobipro', 'kucoin', 'lakebtc', 'liqui', 'livecoin', 'mixcoins', 'poloniex', 'qryptos', 'quadrigacx', 'quoine',
   'southxchange', 'therock', 'tidex', 'wex', 'zaif'
 ];
 
 // Removed 'cryptopia', 'quadrigacx', 'bleutrade',
-const exchangesWithAccounts = ['gateio', 'huobipro', 'liqui', 'binance' ];
+const exchangesWithAccounts = ['gateio', 'huobipro', 'liqui', 'binance'];
 
 const scannerPriceMarginAfterFees = 2.5;
 const scannerProfitThresholdUsd = 50;
 const realPriceMarginAfterFees = 0.5;
 const realProfitThresholdUsd = 0.05;
 
-const isFiatMarket = (symbol) => ['USD', 'CAD', 'EUR', 'NZD', 'SGD', 'RUB', 'RUR', 'AUD', 'GBP', 'HKD', 'JPY' ].some(c => symbol.endsWith(`/${c}`));
+const isFiatMarket = (symbol) => ['USD', 'CAD', 'EUR', 'NZD', 'SGD', 'RUB', 'RUR', 'AUD', 'GBP', 'HKD', 'JPY'].some(c => symbol.endsWith(`/${c}`));
 const isSettlementCurrencyMarket = (symbol) => parseCurrenciesFromSymbol(symbol).every(cur => ['ETH', 'BTC', 'USDT'].includes(cur));
 
 /* TODO This is duplicated code */
@@ -32,7 +32,7 @@ function parseCurrenciesFromSymbol(symbol) {
 async function getExperimentConfiguration(name) {
   const configurations = {
     scan: async () => await genericExchangePairExperiment({
-      exchangeIds : process.argv.length > 2 && process.argv.slice(3),
+      exchangeIds: process.argv.length > 2 && process.argv.slice(3),
       logSummaryTable: true,
       infiniteHoldings: true,
       logTradeDescriptions: true,

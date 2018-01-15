@@ -2,18 +2,18 @@ function calcEarningsFromOrders(orderBook, approximateValueOfCurrencyB) {
   const deltaReducer = (orderType) => (prev, curr) => {
     const { exchangeId } = curr;
     const existingDelta = prev[exchangeId] || {};
-    
+
     /* To fulfil a bid (buy order), you sell A. Gaining B */
     /* To fulfil an ask (sell order), you buy A. Losing B */
     const sign = orderType === 'bid' ? -1 : +1;
-    
+
     prev[exchangeId] = {
       deltaA: (existingDelta.deltaA || 0) + (sign * curr.amount),
       deltaB: (existingDelta.deltaB || 0) + (-sign * curr.amount * curr.priceWithFee),
     };
     return prev;
   };
-  
+
   const bidHoldingsDelta = orderBook.bids.reduce(deltaReducer('bid'), {});
   const deltaByExchange = orderBook.asks.reduce(deltaReducer('ask'), bidHoldingsDelta);
 
@@ -23,7 +23,7 @@ function calcEarningsFromOrders(orderBook, approximateValueOfCurrencyB) {
   }), { deltaA: 0, deltaB: 0 })
 
   const allOrders = orderBook.bids.concat(orderBook.asks);
-  
+
   const totalVolumeA = allOrders.reduce((prev, curr) => prev += curr.amount, 0);
   const meanOrderPrice = allOrders.reduce((prev, curr) => prev += curr.priceWithFee * curr.amount / totalVolumeA, 0);
   const totalVolumeB = meanOrderPrice * totalVolumeA;
