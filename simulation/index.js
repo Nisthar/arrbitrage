@@ -54,7 +54,7 @@ const asTable = require('as-table').configure({ delimiter: '|', print: obj => !N
 
 async function processExecutedTrades(trades, executedTrades, currencies) {
   const all = trades.buy.concat(trades.sell);
-  for (let index of all) {
+  for (let index in all) {
     const executedTrade = executedTrades[index];
     const trade = all[index];
     const exchangeId = trade.exchangeId;
