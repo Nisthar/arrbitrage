@@ -17,10 +17,6 @@ const scannerProfitThresholdUsd = 50;
 const realPriceMarginAfterFees = 0.5;
 const realProfitThresholdUsd = 0.05;
 
-
-// const heldCurrencies = ['NEO', 'BTC', 'ETH', 'BAT', 'AST', 'RCN', 'GNT', 'REP', 'GNO', 'STORJ', 'BNT', 'MTX', 'BTG', 'KIN', 'LTC', 'DOGE', 'XLM', 'USDT', 'XMR' ];
-const heldCurrencies = ['AST', 'BAT', 'BCD', 'BNT', 'BTC', 'BTG', 'ETH', 'GNT', 'REP', 'STORJ'];
-const isAcceptedCurrencies = (symbol) => heldCurrencies.some(c => symbol.startsWith(`${c}/`)) && heldCurrencies.some(c => symbol.endsWith(`/${c}`));
 const isFiatMarket = (symbol) => ['USD', 'CAD', 'EUR', 'NZD', 'SGD', 'RUB', 'RUR', 'AUD', 'GBP', 'HKD', 'JPY' ].some(c => symbol.endsWith(`/${c}`));
 const isSettlementCurrencyMarket = (symbol) => parseCurrenciesFromSymbol(symbol).every(cur => ['ETH', 'BTC', 'USDT'].includes(cur));
 
@@ -52,11 +48,21 @@ async function getExperimentConfiguration(name) {
       priceMarginAfterFees: scannerPriceMarginAfterFees,
       profitThresholdUsd: scannerProfitThresholdUsd,
     }),
-    scanApprovedExchanges: async () => await genericExchangePairExperiment({
+    scanApprovedExchangesAllCurrencies: async () => await genericExchangePairExperiment({
       exchangeIds: exchangesWithAccounts,
       symbolFilter: sym => !isFiatMarket(sym),
       logSummaryTable: true,
       infiniteHoldings: true,
+      logTradeDescriptions: true,
+      priceMarginAfterFees: scannerPriceMarginAfterFees,
+      profitThresholdUsd: scannerProfitThresholdUsd,
+    }),
+    scanApprovedExchangesHeldCurrencies: async () => await genericExchangePairExperiment({
+      exchangeIds: exchangesWithAccounts,
+      symbolFilter: sym => !isFiatMarket(sym),
+      logSummaryTable: true,
+      infiniteHoldings: true,
+      useHeldCurrencies: true,
       logTradeDescriptions: true,
       priceMarginAfterFees: scannerPriceMarginAfterFees,
       profitThresholdUsd: scannerProfitThresholdUsd,
@@ -69,7 +75,8 @@ async function getExperimentConfiguration(name) {
     },
     real: async () => await genericExchangePairExperiment({
       exchangeIds: exchangesWithAccounts,
-      symbolFilter: sym => !isFiatMarket(sym) && isAcceptedCurrencies(sym) && !isSettlementCurrencyMarket(sym),
+      symbolFilter: sym => !isFiatMarket(sym) && !isSettlementCurrencyMarket(sym),
+      useHeldCurrencies: true,
       logDetailedTrades: false,
       logTradeDescriptions: true,
       logSummaryTable: false,
@@ -88,7 +95,7 @@ async function getExperimentConfiguration(name) {
 
     config = result;
   }
-  
+
   return config;
 }
 
@@ -96,5 +103,4 @@ module.exports = {
   exchangesWithAccounts,
   getExperimentConfiguration,
   isFiatMarket,
-  heldCurrencies,
 };
