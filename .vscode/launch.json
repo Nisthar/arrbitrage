@@ -15,7 +15,15 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Real",
+      "name": "Holdings",
+      "program": "${workspaceRoot}/holdings",
+      "args": [],
+      "cwd": "${workspaceRoot}"
+    },    
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Simulation",
       "program": "${workspaceRoot}/simulation/index.js",
       "args": ["real"],
       "cwd": "${workspaceRoot}"
