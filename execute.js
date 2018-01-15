@@ -20,3 +20,5 @@ const [exchangeId, orderType, amount, symbol, price] = process.argv.splice(2);
   // //   console.log(JSON.stringify(order));
   // // } while (false);
 })();
+
+process.on('unhandledRejection', r => console.log(r));
