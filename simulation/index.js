@@ -59,7 +59,7 @@ async function processExecutedTrades(trades, executedTrades, currencies) {
     const trade = all[index];
     const exchangeId = trade.exchangeId;
     
-    if (executedTrade === null) {
+    if (!executedTrade) {
       console.log(`TRADE FAILED: ${exchangeId}`);
     } else {
       console.log(`TRADE ${exchangeId}: ${executedTrade.id}`);
