@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const getHoldingsOnExchange = require('./getHoldingsOnExchange');
+const { getHoldingsOnExchange, adjustBalanceBasedOnSpending } = require('./getHoldingsOnExchange');
 
 describe('Get holdings on exchange', () => {
   it('Balance properly propogating', (done) => {
@@ -58,5 +58,27 @@ describe('Get holdings on exchange', () => {
       });
       done();
     })();
+  });
+});
+
+describe('Adjust balance based on spending', () => {
+  const currencies = [ 'abc', 'def' ];
+
+  it('Buy some A', () => {
+    const trade = { exchangeId: 'A', orderType: 'buy', amount: 1.5, price: 5.00 };
+    const callback = sinon.spy();
+    const result = adjustBalanceBasedOnSpending(trade, currencies, callback);
+
+    expect(callback.calledOnce).to.eq(true);
+    expect(callback.getCall(0).args).to.deep.eq(['A', 'def', 7.5]);
+  });
+
+  it('Sell some A', () => {
+    const trade = { exchangeId: 'B', orderType: 'sell', amount: 100, price: 7.50 };
+    const callback = sinon.spy();
+    const result = adjustBalanceBasedOnSpending(trade, currencies, callback);
+
+    expect(callback.calledOnce).to.eq(true);
+    expect(callback.getCall(0).args).to.deep.eq(['B', 'abc', 750]);
   });
 });

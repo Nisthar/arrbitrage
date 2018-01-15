@@ -16,10 +16,10 @@ describe('Get trades from orders', () => {
     };
     const result = getTradesFromOrders(orderBook);
     expect(result).to.deep.eq({
-      sell: [ { exchangeId: 'b', price: 4.5, amount: 3.9 } ],
+      sell: [ { exchangeId: 'b', price: 4.5, amount: 3.9, orderType: 'sell' } ],
       buy: [
-        { exchangeId: 'a', price: 4.5, amount: 3.9 },
-        { exchangeId: 'c', price: 2.9, amount: 1 }
+        { exchangeId: 'a', price: 4.5, amount: 3.9, orderType: 'buy' },
+        { exchangeId: 'c', price: 2.9, amount: 1, orderType: 'buy' }
       ],
     });
   });

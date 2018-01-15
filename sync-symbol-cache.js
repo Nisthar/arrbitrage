@@ -1,13 +1,13 @@
 const ccxt = require('ccxt');
 const fs = require('fs');
 
+const cachePath = './symbols.json';
+if (fs.existsSync(cachePath)) fs.unlinkSync(cachePath);
+
 const HashMapCachedAsFile = require('./lib/HashMapCachedAsFile');
 const { fetchExchanges } = require('./simulation/fetchExchangeData');
 
 (async function main() {
-  const cachePath = './symbols.json';
-  if (fs.existsSync(cachePath)) fs.unlinkSync(cachePath);
-
   const symbolCache = new HashMapCachedAsFile(cachePath);
   const exchangeIds = ccxt.exchanges;
   const exchanges = await fetchExchanges(exchangeIds);

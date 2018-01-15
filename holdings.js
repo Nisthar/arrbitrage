@@ -1,3 +1,8 @@
+const fs = require('fs');
+
+const cachePath = './holdings.json';
+if (fs.existsSync(cachePath)) fs.unlinkSync(cachePath);
+
 const { exchangesWithAccounts } = require('./simulation/experimentConfigurations');
 const { fetchBalances } = require('./simulation/fetchExchangeData');
 

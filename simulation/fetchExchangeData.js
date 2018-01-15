@@ -6,9 +6,23 @@ Uses ccxt to load market information for a given exchange.
 
 const ccxt = require('ccxt');
 const credentials = require('./../credentials');
+const HashMapCachedAsFile = require('./../lib/HashMapCachedAsFile');
 
 const exchangeCache = {};
-const balanceCache = {};
+
+const holdingCacheMiss = async exchangeId => {
+  console.log(`Balance cache miss for ${exchangeId}`);
+  const exchange = await fetchExchange(exchangeId);
+  const balance = await execute(() => exchange.fetchBalance());
+  if (balance && balance.free) {
+    return balance.free;
+  }
+
+  console.warn(`Unable to fetch balance for ${exchangeId}`)
+  return undefined;
+};
+const holdingCache = new HashMapCachedAsFile('./holdings.json', holdingCacheMiss);
+holdingCache.load();
 
 async function fetchExchange(exchangeId) {
   if (!exchangeCache[exchangeId]) {
@@ -22,18 +36,15 @@ async function fetchExchange(exchangeId) {
 }
 
 async function fetchBalance(exchangeId) {
-  if (!balanceCache[exchangeId]) {
-    const exchange = await fetchExchange(exchangeId);
-    const balance = await execute(() => exchange.fetchBalance());
-    if (balance && balance.free) {
-      balanceCache[exchangeId] = balance.free;
-    } else {
-      console.warn(`Unable to fetch balance for ${exchangeId}`)
-      balanceCache[exchangeId] = {};
-    }
-  }
+  return await holdingCache.get(exchangeId);
+}
 
-  return balanceCache[exchangeId];
+async function adjustCurrencyBalanceOnSpend(exchangeId, currency, amount) {
+  const balance = await holdingCache.get(exchangeId);
+  const currencyBalance = balance[currency] || 0;
+  balance[currency] = currencyBalance - amount;
+
+  holdingCache.set(exchangeId, balance);
 }
 
 async function fetchOrderBook(exchangeId, symbol) {
@@ -82,6 +93,7 @@ async function executeTrade(exchangeId, orderType, amount, symbol, price) {
 }
 
 async function fetchExchanges(exchangeIds) {
+  console.log(`Fetching exchange data for ${exchangeIds}`);
   const promiseToFetchExchange = exchangeIds.map(id => fetchExchange(id));
   return (await Promise.all(promiseToFetchExchange)).reduce((cur, exchange, index) => {
     const exchangeId = exchangeIds[index];
@@ -91,7 +103,6 @@ async function fetchExchanges(exchangeIds) {
 }
 
 async function fetchOrderBooks(exchangeIds, symbol) {
-  console.log(`Fetching order books for ${symbol} on ${exchangeIds}`);
   const promiseToFetchBooks = exchangeIds.map(id => fetchOrderBook(id, symbol));
   return (await Promise.all(promiseToFetchBooks)).reduce((cur, orderBook, index) => {
     const exchangeId = exchangeIds[index];
@@ -101,7 +112,6 @@ async function fetchOrderBooks(exchangeIds, symbol) {
 }
 
 async function fetchBalances(exchangeIds) {
-  console.log(`Fetching balance on ${exchangeIds}`);
   const promiseToFetchBalances = exchangeIds.map(id => fetchBalance(id));
   return (await Promise.all(promiseToFetchBalances)).reduce((cur, balance, index) => {
     const exchangeId = exchangeIds[index];
@@ -163,4 +173,5 @@ module.exports = {
   fetchBalances,
   fetchOrderBook,
   fetchOrderBooks,
+  adjustCurrencyBalanceOnSpend,
 };

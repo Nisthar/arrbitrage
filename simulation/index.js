@@ -1,6 +1,6 @@
 const { getExperimentConfiguration } = require('./experimentConfigurations');
 const { fetchOrderBooks, executeTrades } = require('./fetchExchangeData.js');
-const getHoldingsOnExchange = require('./getHoldingsOnExchange');
+const { getHoldingsOnExchange, adjustBalanceBasedOnSpending } = require('./getHoldingsOnExchange');
 const getFulfillableOrders = require('./getFulfillableOrders');
 const getProfitableOrders = require('./getProfitableOrders');
 const calcEarningsFromOrders = require('./calcEarningsFromOrders');
@@ -40,8 +40,7 @@ const asTable = require('as-table').configure({ delimiter: '|', print: obj => !N
 
         if (experimentConfiguration.autoExecuteTrades) {
           const executedTrades = await executeTrades(trades, symbol);
-          console.log(JSON.stringify(executedTrades, null, 2));
-          console.log('');
+          await processExecutedTrades(trades, executedTrades, currencies);
           process.exit(1);
         }
       }
@@ -52,6 +51,22 @@ const asTable = require('as-table').configure({ delimiter: '|', print: obj => !N
     console.log(asTable(summaries));
   }
 })();
+
+async function processExecutedTrades(trades, executedTrades, currencies) {
+  const all = trades.buy.concat(trades.sell);
+  for (let index of all) {
+    const executedTrade = executedTrades[index];
+    const trade = all[index];
+    const exchangeId = trade.exchangeId;
+    
+    if (executedTrade === null) {
+      console.log(`TRADE FAILED: ${exchangeId}`);
+    } else {
+      console.log(`TRADE ${exchangeId}: ${executedTrade.id}`);
+      await adjustBalanceBasedOnSpending(trade, currencies);
+    }
+  }
+}
 
 const summaries = [];
 function saveAndLogArrbitrage(symbol, earnings, holdings, currencies, trades, { logDetailedTrades, logTradeDescriptions }) {
