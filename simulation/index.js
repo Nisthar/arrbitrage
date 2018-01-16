@@ -41,7 +41,6 @@ const asTable = require('as-table').configure({ delimiter: '|', print: obj => !N
         if (experimentConfiguration.autoExecuteTrades) {
           const executedTrades = await executeTrades(trades, symbol);
           await processExecutedTrades(trades, executedTrades, currencies);
-          process.exit(1);
         }
       }
     }
