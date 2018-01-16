@@ -16,8 +16,8 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Sync Symbols",
-      "program": "${workspaceRoot}/sync-symbol-cache.js",
+      "name": "Sync Market Data Cache",
+      "program": "${workspaceRoot}/sync-market-data-cache.js",
       "args": [],
       "cwd": "${workspaceRoot}"
     },
