@@ -6,6 +6,7 @@ Uses ccxt to load market information for a given exchange.
 
 const ccxt = require('ccxt');
 const fs = require('fs');
+const path = require('path');
 const credentials = require('./../credentials');
 const HashMapCachedAsFile = require('./../lib/HashMapCachedAsFile');
 
