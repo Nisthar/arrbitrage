@@ -40,9 +40,15 @@ async function fetchBalance(exchangeId) {
 }
 
 async function adjustCurrencyBalanceOnSpend(exchangeId, currency, amount) {
+  /*
+  We must reload the cache just in case it was written to during the execution. 
+  This is ghetto and we should really use data bases or just be a better programmer and long-haul.
+  */
+  holdingCache.load();
+
   const balance = await holdingCache.get(exchangeId);
   const currencyBalance = balance[currency] || 0;
-  balance[currency] = currencyBalance - amount;
+  balance[currency] = currencyBalance - amount * 1.1;
 
   holdingCache.set(exchangeId, balance);
 }
