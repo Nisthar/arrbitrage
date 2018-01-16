@@ -2,6 +2,7 @@ node_modules
 credentials.js
 credentials.template
 ec2.pem
-symbols.json
+exchange-data.json
 holdings.json
 test.json
+market-data.json
