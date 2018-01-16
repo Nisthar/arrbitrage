@@ -2,19 +2,23 @@
 
 const ccxt = require ('ccxt');
 
-const { fetchExchanges, fetchBalances } = require('./fetchExchangeData');
+const { getMarketData, fetchBalances } = require('./fetchExchangeData');
 
 async function genericExchangePairExperiment(settings) {
   const { exchangeIds, symbolFilter } = settings;
-  const exchanges = await fetchExchanges(exchangeIds);
+  const markets = getMarketData();
   
   // get all unique symbols
-  const uniqueSymbols = ccxt.unique (ccxt.flatten (exchangeIds.map (id => exchanges[id].symbols))).filter(s => !s.endsWith('.d') && (!symbolFilter || symbolFilter(s)));
+  const allSymbols = exchangeIds.map(id => markets[id].symbols).reduce((aggregate, symbols) => {
+    const acceptableSymbols = symbols && symbols.filter(s => !s.endsWith('.d') && (!symbolFilter || symbolFilter(s)));
+    if (symbols) aggregate = aggregate.concat(acceptableSymbols);
+    return aggregate;
+  }, []);
+  const uniqueSymbols = Array.from(new Set(allSymbols));
 
   // filter out symbols that are not present on at least two exchanges
   let arbitrableSymbols = uniqueSymbols
-    .filter (symbol => 
-        exchangeIds.filter (id => (exchanges[id].symbols.indexOf (symbol) >= 0)).length > 1)
+    .filter (symbol => exchangeIds.filter(id => (markets[id] && markets[id].symbols && markets[id].symbols.indexOf (symbol) >= 0)).length > 1)
     .sort ((id1, id2) => (id1 > id2) ? 1 : ((id2 > id1) ? -1 : 0));
 
   if (settings.useHeldCurrencies) {

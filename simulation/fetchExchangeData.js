@@ -5,6 +5,7 @@ Uses ccxt to load market information for a given exchange.
 */
 
 const ccxt = require('ccxt');
+const fs = require('fs');
 const credentials = require('./../credentials');
 const HashMapCachedAsFile = require('./../lib/HashMapCachedAsFile');
 
@@ -24,12 +25,16 @@ const holdingCacheMiss = async exchangeId => {
 const holdingCache = new HashMapCachedAsFile('./holdings.json', holdingCacheMiss);
 holdingCache.load();
 
+function getMarketData() {
+  const cachedExchangeData = fs.readFileSync('./market-data.json');
+  return JSON.parse(cachedExchangeData);
+}
+
 async function fetchExchange(exchangeId) {
   if (!exchangeCache[exchangeId]) {
     const exchangeCredentials = credentials[exchangeId] || {};
     exchangeCache[exchangeId] = new ccxt[exchangeId](exchangeCredentials);
     exchangeCache[exchangeId].enableRateLimit = true;
-    await execute(() => exchangeCache[exchangeId].loadMarkets());
   }
 
   return exchangeCache[exchangeId];
@@ -54,23 +59,25 @@ async function adjustCurrencyBalanceOnSpend(exchangeId, currency, amount) {
 }
 
 async function fetchOrderBook(exchangeId, symbol) {
+  const markets = getMarketData()[exchangeId];
   const exchange = await fetchExchange(exchangeId);
-  if (!exchange.markets[symbol]) {
+  if (!markets[symbol]) {
     return {};
   }
 
   const orderBook = await execute(() => exchange.fetchL2OrderBook(symbol));
   if (!orderBook) return undefined;
 
-  const feeRate = exchange.markets[symbol].taker;
+  const feeRate = markets[symbol].taker || 0;
   const mapOrderToObject = (order, activeFeeRate) => {
-    const fee = exchange.feeToPrecision(symbol, activeFeeRate * order[0]);
+    const impreciseFee = activeFeeRate * order[0];
+    const preciseFee = exchange.markets[symbol].precision ? Number.parseFloat(exchange.feeToPrecision(symbol, activeFeeRate * order[0])) : impreciseFee;
   
     return {
       exchangeId,
       price: order[0],
       amount: order[1],
-      priceWithFee: order[0] + fee,
+      priceWithFee: order[0] + preciseFee,
     };
   }
 
@@ -81,9 +88,9 @@ async function fetchOrderBook(exchangeId, symbol) {
 }
 
 async function getTradeLimits(exchangeIds, symbol) {
-  const exchanges = await fetchExchanges(exchangeIds);
+  const markets = getMarketData();
   return exchangeIds.reduce((aggregate, id) => {
-    aggregate[id] = exchanges[id].markets[symbol] && exchanges[id].markets[symbol].limits;
+    aggregate[id] = markets[id] && markets[id][symbol] && markets[id][symbol].limits;
     return aggregate;
   }, {});
 }
@@ -110,7 +117,6 @@ async function executeTrade(exchangeId, orderType, amount, symbol, price) {
 }
 
 async function fetchExchanges(exchangeIds) {
-  console.log(`Fetching exchange data for ${exchangeIds}`);
   const promiseToFetchExchange = exchangeIds.map(id => fetchExchange(id));
   return (await Promise.all(promiseToFetchExchange)).reduce((cur, exchange, index) => {
     const exchangeId = exchangeIds[index];
@@ -154,7 +160,7 @@ async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function execute(func, maxRetries = 10, sleepBeforeRequests = 1000) {
+async function execute(func, maxRetries = 5, sleepBeforeRequests = 1000) {
   for (let numRetries = 0; numRetries < maxRetries; numRetries++) {
     try {
       await sleep(sleepBeforeRequests);
@@ -191,5 +197,6 @@ module.exports = {
   fetchBalances,
   fetchOrderBook,
   fetchOrderBooks,
+  getMarketData,
   getTradeLimits,
 };

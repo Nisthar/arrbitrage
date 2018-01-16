@@ -19,3 +19,5 @@ const exchangeIds = ['_1btcxe', 'acx', 'allcoin', 'anxpro', 'binance', 'bit2c', 
   const cryptoExchanges = exchangeIds.filter(id => markets[id] && markets[id].includes('ETH/BTC'));
   console.log(cryptoExchanges);
 })();
+
+process.on('unhandledRejection', r => console.log(r));
