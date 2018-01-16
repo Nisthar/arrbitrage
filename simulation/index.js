@@ -21,8 +21,8 @@ const asTable = require('as-table').configure({ delimiter: '|', print: obj => !N
 
     /* Fetch the order books for the symbol from each exchange */
     /* Adjust each order book to accomodate for market fees */
-    const exchangesWithHoldings = experimentConfiguration.exchangeIds.filter(id => holdings[id].some(value => value > 0));
-    if (!exchangesWithHoldings.some(id => holdings[id][0] > 0)) continue;
+    const exchangesWithHoldings = experimentConfiguration.exchangeIds.filter(id => !holdings || holdings[id].some(value => value > 0));
+    if (!exchangesWithHoldings.some(id => !holdings || holdings[id][0] > 0)) continue;
     const orderBooks = await fetchOrderBooks(exchangesWithHoldings, symbol);
     
     /* Based on our holdings in the marketplace, take the fulfillable orders from each market's book */
