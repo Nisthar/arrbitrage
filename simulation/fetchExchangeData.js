@@ -35,8 +35,8 @@ async function fetchExchange(exchangeId) {
   return exchangeCache[exchangeId];
 }
 
-async function fetchBalance(exchangeId) {
-  return await holdingCache.get(exchangeId);
+async function fetchBalance(exchangeId, useCache) {
+  return useCache ? await holdingCache.get(exchangeId) : await holdingCacheMiss(exchangeId);
 }
 
 async function adjustCurrencyBalanceOnSpend(exchangeId, currency, amount) {
@@ -80,13 +80,21 @@ async function fetchOrderBook(exchangeId, symbol) {
   };
 }
 
+async function getTradeLimits(exchangeIds, symbol) {
+  const exchanges = await fetchExchanges(exchangeIds);
+  return exchangeIds.reduce((aggregate, id) => {
+    aggregate[id] = exchanges[id].markets[symbol].limits;
+    return aggregate;
+  }, {});
+}
+
 async function executeTrade(exchangeId, orderType, amount, symbol, price) {
   console.log(`Executing trade ${JSON.stringify(arguments)}`);
 
   if (!['buy', 'sell'].some(o => orderType === o)) throw '[Execute Trade] Invalid order type';
   if (Number.isNaN(amount) || amount < 0) throw '[Execute Trade] Invalid amount';
   if (symbol.length < 6 || symbol.length > 9 || !symbol.includes('/')) throw '[Execute Trade] Invalid symbol';
-  if (Number.isNaN(price)) throw '[Execute Trade] Invalid price';
+  if (Number.isNaN(price)) throw '[Execute Trade] Invalid price'; 
 
   const exchange = await fetchExchange(exchangeId);
 
@@ -120,8 +128,8 @@ async function fetchOrderBooks(exchangeIds, symbol) {
   }, {});
 }
 
-async function fetchBalances(exchangeIds) {
-  const promiseToFetchBalances = exchangeIds.map(id => fetchBalance(id));
+async function fetchBalances(exchangeIds, useCache) {
+  const promiseToFetchBalances = exchangeIds.map(id => fetchBalance(id, useCache));
   return (await Promise.all(promiseToFetchBalances)).reduce((cur, balance, index) => {
     const exchangeId = exchangeIds[index];
     cur[exchangeId] = balance;
@@ -174,6 +182,7 @@ async function execute(func, maxRetries = 10, sleepBeforeRequests = 1000) {
 }
 
 module.exports = {
+  adjustCurrencyBalanceOnSpend,
   executeTrade,
   executeTrades,
   fetchExchange,
@@ -182,5 +191,5 @@ module.exports = {
   fetchBalances,
   fetchOrderBook,
   fetchOrderBooks,
-  adjustCurrencyBalanceOnSpend,
+  getTradeLimits,
 };
