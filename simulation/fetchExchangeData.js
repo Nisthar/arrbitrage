@@ -62,18 +62,21 @@ async function fetchOrderBook(exchangeId, symbol) {
   const orderBook = await execute(() => exchange.fetchL2OrderBook(symbol));
   if (!orderBook) return undefined;
 
-  const takerFee = exchange.markets[symbol].taker;
-
-  const mapOrderToObject = (order, fee) => ({
-    exchangeId,
-    price: order[0],
-    amount: order[1],
-    priceWithFee: order[0] * (1 + fee),
-  });
+  const feeRate = exchange.markets[symbol].taker;
+  const mapOrderToObject = (order, activeFeeRate) => {
+    const fee = exchange.feeToPrecision(symbol, activeFeeRate * order[0]);
+  
+    return {
+      exchangeId,
+      price: order[0],
+      amount: order[1],
+      priceWithFee: order[0] + fee,
+    };
+  }
 
   return {
-    bids: orderBook.bids.map(o => mapOrderToObject(o, -takerFee)),
-    asks: orderBook.asks.map(o => mapOrderToObject(o, takerFee)),
+    bids: orderBook.bids.map(o => mapOrderToObject(o, -feeRate)),
+    asks: orderBook.asks.map(o => mapOrderToObject(o, feeRate)),
   };
 }
 
