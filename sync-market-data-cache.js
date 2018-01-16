@@ -11,7 +11,13 @@ const { fetchExchanges } = require('./simulation/fetchExchangeData');
   const exchangeDataCache = new HashMapCachedAsFile(cachePath);
   const exchangeIds = ccxt.exchanges;
   const exchanges = await fetchExchanges(exchangeIds);
-  await Promise.all(exchanges.map(e => e.loadMarkets()));
+  await Promise.all(exchangeIds.map(id => {
+    try {
+      exchanges[id].loadMarkets();
+    } catch (e) {
+      console.warn(e);
+    }
+  }));
 
   const content = exchangeIds.reduce((current, exchangeId) => {
     const exchange = exchanges[exchangeId];
