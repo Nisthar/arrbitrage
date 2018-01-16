@@ -1,5 +1,5 @@
 const { getExperimentConfiguration } = require('./experimentConfigurations');
-const { fetchOrderBooks, executeTrades } = require('./fetchExchangeData.js');
+const { fetchOrderBooks, executeTrades, getTradeLimits } = require('./fetchExchangeData.js');
 const { getHoldingsOnExchange, adjustBalanceBasedOnSpending } = require('./getHoldingsOnExchange');
 const getFulfillableOrders = require('./getFulfillableOrders');
 const getProfitableOrders = require('./getProfitableOrders');
@@ -14,14 +14,17 @@ const asTable = require('as-table').configure({ delimiter: '|', print: obj => !N
 
   const experimentConfiguration = await getExperimentConfiguration(experimentName);
   for (const symbol of experimentConfiguration.symbols) {
-    /* Fetch the order books for the symbol from each exchange */
-    /* Adjust each order book to accomodate for market fees */
-    const orderBooks = await fetchOrderBooks(experimentConfiguration.exchangeIds, symbol);
-
     /* Determine our current holdings on the market */
     const currencies = parseCurrenciesFromSymbol(symbol);
-    const holdings = !experimentConfiguration.infiniteHoldings ? await getHoldingsOnExchange(experimentConfiguration.exchangeIds, currencies) : undefined;
+    const limits = await getTradeLimits(experimentConfiguration.exchangeIds, symbol);
+    const holdings = !experimentConfiguration.infiniteHoldings ? await getHoldingsOnExchange(experimentConfiguration.exchangeIds, currencies, limits) : undefined;
 
+    /* Fetch the order books for the symbol from each exchange */
+    /* Adjust each order book to accomodate for market fees */
+    const exchangesWithHoldings = experimentConfiguration.exchangeIds.filter(id => holdings[id].some(value => value > 0));
+    if (!exchangesWithHoldings.some(id => holdings[id][0] > 0)) continue;
+    const orderBooks = await fetchOrderBooks(exchangesWithHoldings, symbol);
+    
     /* Based on our holdings in the marketplace, take the fulfillable orders from each market's book */
     /* Merge the order books into one sorted order book */
     const fulfillableOrderBook = getFulfillableOrders(orderBooks, holdings);
@@ -29,11 +32,11 @@ const asTable = require('as-table').configure({ delimiter: '|', print: obj => !N
     /* Pull out the profitable order pairs */
     const profitableOrders = getProfitableOrders(fulfillableOrderBook, experimentConfiguration.priceMarginAfterFees || 0);
 
-    if (profitableOrders.asks && profitableOrders.asks.length > 0) {
+    if (profitableOrders.asks.length > 0 && profitableOrders.bids.length > 0) {
       /* Calculate the profit that will be made and the percent margin on stake */
       const usdValueForCurrencyB = cryptoValuation[currencies[1]];
-      const earnings = calcEarningsFromOrders(profitableOrders, usdValueForCurrencyB);
       const trades = getTradesFromOrders(profitableOrders);
+      const earnings = calcEarningsFromOrders(profitableOrders, usdValueForCurrencyB);
       
       if (!experimentConfiguration.profitThresholdUsd || earnings.earnedUsd >= experimentConfiguration.profitThresholdUsd) {
         saveAndLogArrbitrage(symbol, earnings, holdings, currencies, trades, experimentConfiguration);
@@ -42,7 +45,7 @@ const asTable = require('as-table').configure({ delimiter: '|', print: obj => !N
           const executedTrades = await executeTrades(trades, symbol);
           await processExecutedTrades(trades, executedTrades, currencies);
         }
-        
+
         console.log('======');
         console.log('');
       }

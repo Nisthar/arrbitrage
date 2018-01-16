@@ -36,7 +36,7 @@ async function fetchExchange(exchangeId) {
 }
 
 async function fetchBalance(exchangeId, useCache) {
-  return useCache ? await holdingCache.get(exchangeId) : await holdingCacheMiss(exchangeId);
+  return useCache !== undefined && !useCache ? await holdingCacheMiss(exchangeId) : await holdingCache.get(exchangeId);
 }
 
 async function adjustCurrencyBalanceOnSpend(exchangeId, currency, amount) {
@@ -83,7 +83,7 @@ async function fetchOrderBook(exchangeId, symbol) {
 async function getTradeLimits(exchangeIds, symbol) {
   const exchanges = await fetchExchanges(exchangeIds);
   return exchangeIds.reduce((aggregate, id) => {
-    aggregate[id] = exchanges[id].markets[symbol].limits;
+    aggregate[id] = exchanges[id].markets[symbol] && exchanges[id].markets[symbol].limits;
     return aggregate;
   }, {});
 }

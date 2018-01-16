@@ -32,6 +32,7 @@ function getProfitableOrders(orderBook, priceMarginPercent = 0) {
     }
   }
 
+  result.all = [ ...result.asks, ...result.bids ];
   return result;
 }
 

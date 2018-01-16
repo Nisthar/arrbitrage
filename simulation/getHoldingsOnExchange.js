@@ -1,14 +1,13 @@
+const isAmountWithinLimits = require('./../lib/is-amount-within-limit');
 const { fetchBalance, adjustCurrencyBalanceOnSpend } = require('./fetchExchangeData.js');
 
-async function getHoldingsOnExchange(exchangeIds, currencies, fetch = fetchBalance) {
+async function getHoldingsOnExchange(exchangeIds, currencies, limits, fetch = fetchBalance) {
   const [ currencyA, currencyB ] = currencies;
   const result = { currencyA, currencyB };
   for (let exchangeId of exchangeIds) {
-    const balance = await fetch(exchangeId) || {};
-    result[exchangeId] = [
-      balance[currencyA] || 0,
-      balance[currencyB] || 0
-    ];
+    const balances = await fetch(exchangeId) || {};
+    const balanceA = isAmountWithinLimits(limits, exchangeId, balances[currencyA]) ? balances[currencyA] : 0;
+    result[exchangeId] = [ balanceA || 0, balances[currencyB] || 0 ];
   }
 
   return result;

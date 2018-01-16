@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const getProfitableOrders = require('./getProfitableOrders');
 const genOrder = (price, amount) => ({amount, priceWithFee: price});
-const emptyOrder = { asks: [], bids: [] };
+const emptyOrder = { asks: [], bids: [], all: [] };
 
 describe('Get profitable orders', () => {
   describe('Unit tests for single exchange', () => {

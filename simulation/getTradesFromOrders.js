@@ -1,14 +1,18 @@
-function getTradesFromOrders(orderBook) {
+const isAmountWithinLimits = require('./../lib/is-amount-within-limit');
+
+function getTradesFromOrders(orderBook, limits) {
   const trades = [];
   
-  return {
-    buy: buildTradesFromOrderBook('buy', orderBook.asks),
-    sell: buildTradesFromOrderBook('sell', orderBook.bids),
+  const result = {
+    buy: buildTradesFromOrders('buy', orderBook.asks, limits),
+    sell: buildTradesFromOrders('sell', orderBook.bids, limits),
   };
+  result.all = [ ...result.buy, ...result.sell ];
+  return result;
 }
 
-function buildTradesFromOrderBook(orderType, orders) {
-  const map = orders.reduce((result, order) => {
+function buildTradesFromOrders(orderType, orders, limits) {
+  const trades = orders.reduce((result, order) => {
     const { exchangeId } = order;
     if (!result[exchangeId]) {
       const initialPrice = orderType === 'buy' ? 0 : Number.MAX_VALUE;
@@ -22,10 +26,14 @@ function buildTradesFromOrderBook(orderType, orders) {
     */
     trade.price = orderType === 'buy' ? Math.max(trade.price, order.price) : Math.min(trade.price, order.price);
     trade.amount += order.amount;
+    trade.isValid = isAmountWithinLimits(limits, exchangeId, trade.amount);
+
     return result;
   }, {});
 
-  return Object.keys(map).map(exchangeId => Object.assign({ exchangeId }, map[exchangeId] ));
+  return Object.keys(trades)
+    .map(exchangeId => Object.assign({ exchangeId }, trades[exchangeId] ))
+    .filter(trade => trade.isValid);
 }
 
 module.exports = getTradesFromOrders;
