@@ -24,7 +24,7 @@ async function adjustBalanceBasedOnSpending(trade, currencies, callback = adjust
     amountSpent = trade.amount * trade.price;
   } else if (orderType === 'sell') {
     currencySpent = currencies[0];
-    amountSpent = trade.amount * trade.price;
+    amountSpent = trade.amount;
   } else {
     throw '[adjustBalanceBasedOnSpending] Invalid order type';
   }
