@@ -42,6 +42,9 @@ const asTable = require('as-table').configure({ delimiter: '|', print: obj => !N
           const executedTrades = await executeTrades(trades, symbol);
           await processExecutedTrades(trades, executedTrades, currencies);
         }
+        
+        console.log('======');
+        console.log('');
       }
     }
   }
