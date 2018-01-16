@@ -102,7 +102,7 @@ async function executeTrade(exchangeId, orderType, amount, symbol, price) {
 
   if (!['buy', 'sell'].some(o => orderType === o)) throw '[Execute Trade] Invalid order type';
   if (Number.isNaN(amount) || amount < 0) throw '[Execute Trade] Invalid amount';
-  if (symbol.length < 6 || symbol.length > 9 || !symbol.includes('/')) throw '[Execute Trade] Invalid symbol';
+  if (symbol.length < 6 || symbol.length > 12 || !symbol.includes('/')) throw '[Execute Trade] Invalid symbol';
   if (Number.isNaN(price)) throw '[Execute Trade] Invalid price'; 
 
   const exchange = await fetchExchange(exchangeId);
