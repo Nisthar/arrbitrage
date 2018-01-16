@@ -26,7 +26,9 @@ const holdingCache = new HashMapCachedAsFile('./holdings.json', holdingCacheMiss
 holdingCache.load();
 
 function getMarketData() {
-  const cachedExchangeData = fs.readFileSync('./market-data.json');
+  const marketDataCachePath = path.resolve('./market-data.json');
+  console.log('marketDataCachePath', marketDataCachePath);
+  const cachedExchangeData = fs.readFileSync(marketDataCachePath);
   return JSON.parse(cachedExchangeData);
 }
 
